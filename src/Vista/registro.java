@@ -14,15 +14,28 @@ import javax.swing.UIManager;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 
+import Controlador.controlador;
+import Modelo.Usuario;
+import javax.swing.JOptionPane;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.io.IOException;
+
+// New import for password field
+import javax.swing.JPasswordField;
+
 public class registro extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField txtUsuario;
-	private JTextField txtContrasena;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
+	private JTextField txtNombre;
+	private JTextField txtApellido; 
+	private JTextField txtFechaNac;
+	private JTextField txtCorreo;
+	private JPasswordField txtPass;
 
 	/**
 	 * Launch the application.
@@ -84,15 +97,15 @@ public class registro extends JFrame {
 		lblApellido.setBounds(98, 328, 217, 35);
 		contentPane.add(lblApellido);
 		
-		txtUsuario = new JTextField();
-		txtUsuario.setBounds(327, 282, 300, 35);
-		contentPane.add(txtUsuario);
-		txtUsuario.setColumns(10);
+		txtNombre = new JTextField();
+		txtNombre.setBounds(327, 282, 300, 35);
+		contentPane.add(txtNombre);
+		txtNombre.setColumns(10);
 		
-		txtContrasena = new JTextField();
-		txtContrasena.setColumns(10);
-		txtContrasena.setBounds(327, 328, 300, 35);
-		contentPane.add(txtContrasena);
+		txtApellido = new JTextField();
+		txtApellido.setColumns(10);
+		txtApellido.setBounds(327, 328, 300, 35);
+		contentPane.add(txtApellido);
 		
 		JButton btnEntrar = new JButton("Volver");
 		btnEntrar.setForeground(new Color(240, 248, 255));
@@ -108,20 +121,19 @@ public class registro extends JFrame {
 		btnRegistrar.setBounds(673, 463, 149, 38);
 		contentPane.add(btnRegistrar);
 		
-		textField = new JTextField();
-		textField.setColumns(10);
-		textField.setBounds(327, 374, 300, 35);
-		contentPane.add(textField);
+		txtFechaNac = new JTextField();
+		txtFechaNac.setColumns(10);
+		txtFechaNac.setBounds(327, 374, 300, 35);
+		contentPane.add(txtFechaNac);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(327, 420, 300, 35);
-		contentPane.add(textField_1);
+		txtCorreo = new JTextField();
+		txtCorreo.setColumns(10);
+		txtCorreo.setBounds(327, 420, 300, 35);
+		contentPane.add(txtCorreo);
 		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		textField_2.setBounds(327, 466, 300, 35);
-		contentPane.add(textField_2);
+		txtPass = new JPasswordField();
+		txtPass.setBounds(327, 466, 300, 35);
+		contentPane.add(txtPass);
 		
 		JLabel lblFNacimiento = new JLabel("F. Nacimiento:");
 		lblFNacimiento.setForeground(Color.WHITE);
@@ -137,11 +149,78 @@ public class registro extends JFrame {
 		lblCorreo.setBounds(98, 420, 217, 35);
 		contentPane.add(lblCorreo);
 		
-		JLabel lblContrasena_3 = new JLabel("Contraseña:");
-		lblContrasena_3.setForeground(Color.WHITE);
-		lblContrasena_3.setFont(new Font("Tahoma", Font.PLAIN, 27));
-		lblContrasena_3.setBackground(Color.WHITE);
-		lblContrasena_3.setBounds(98, 466, 217, 35);
-		contentPane.add(lblContrasena_3);
+		JLabel lblContrasena = new JLabel("Contraseña:");
+		lblContrasena.setForeground(Color.WHITE);
+		lblContrasena.setFont(new Font("Tahoma", Font.PLAIN, 27));
+		lblContrasena.setBackground(Color.WHITE);
+		lblContrasena.setBounds(98, 466, 217, 35);
+		contentPane.add(lblContrasena);
+
+		btnRegistrar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String nombre = txtNombre.getText().trim();
+				String apellidos = txtApellido.getText().trim();
+				String fechaStr = txtFechaNac.getText().trim();
+				String correo = txtCorreo.getText().trim();
+				String pass = new String(txtPass.getPassword()).trim();
+
+				if (nombre.isEmpty() || apellidos.isEmpty() || correo.isEmpty() || pass.isEmpty()) {
+					JOptionPane.showMessageDialog(registro.this, "Rellena todos los campos obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				String emailtipo = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
+				if (!correo.matches(emailtipo)) {
+					JOptionPane.showMessageDialog(registro.this, "Introduce un correo electrónico válido.", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				if (pass.length() < 6) {
+					JOptionPane.showMessageDialog(registro.this, "La contraseña debe tener al menos 6 caracteres.", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				Date fecha = null;
+				if (!fechaStr.isEmpty()) {
+					// Normalizar separadores y parsear dd-MM-yyyy
+					String normalized = fechaStr.replace('/', '-').trim();
+					SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+					try {
+						fecha = df.parse(normalized);
+					} catch (ParseException pe) {
+						JOptionPane.showMessageDialog(registro.this, "Formato de fecha incorrecto. Usa dd-MM-aaaa (ej: 31-12-1990)", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				}
+
+				Usuario u = new Usuario(nombre, apellidos, correo, pass, fecha);
+				try {
+					boolean ok = controlador.guardarUsuario(u);
+					if (ok) {
+						JOptionPane.showMessageDialog(registro.this, "Usuario creado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+						
+						registro.this.dispose();
+						login l = new login();
+						l.setVisible(true);
+					} else {
+						JOptionPane.showMessageDialog(registro.this, "Error al crear el usuario. Intenta de nuevo.", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} catch (IOException ex) {
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(registro.this, "Error de conexión: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+
+		
+		btnEntrar.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				registro.this.dispose();
+				login l = new login();
+				l.setVisible(true);
+			}
+		});
 	}
 }
