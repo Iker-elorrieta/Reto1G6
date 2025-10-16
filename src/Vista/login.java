@@ -4,13 +4,11 @@ package Vista;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Image;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
-
 import java.awt.Font;
 import javax.swing.UIManager;
 import javax.swing.JTextField;
@@ -69,12 +67,12 @@ public class login extends JFrame {
 		lblIniciarSesion.setBounds(352, 187, 237, 41);
 		contentPane.add(lblIniciarSesion);
 		
-		JLabel lblUsuario = new JLabel("Usuario:");
-		lblUsuario.setForeground(Color.WHITE);
-		lblUsuario.setFont(new Font("Tahoma", Font.PLAIN, 30));
-		lblUsuario.setBackground(Color.WHITE);
-		lblUsuario.setBounds(112, 282, 156, 41);
-		contentPane.add(lblUsuario);
+		JLabel lblCorreo = new JLabel("Usuario:");
+		lblCorreo.setForeground(Color.WHITE);
+		lblCorreo.setFont(new Font("Tahoma", Font.PLAIN, 30));
+		lblCorreo.setBackground(Color.WHITE);
+		lblCorreo.setBounds(112, 282, 205, 41);
+		contentPane.add(lblCorreo);
 		
 		JLabel lblContrasena = new JLabel("Contraseña:");
 		lblContrasena.setForeground(Color.WHITE);
@@ -84,6 +82,7 @@ public class login extends JFrame {
 		contentPane.add(lblContrasena);
 		
 		txtUsuario = new JTextField();
+		txtUsuario.setText("tucorreo@mail.com"); //`ponemos comentario
 		txtUsuario.setBounds(327, 282, 300, 35);
 		contentPane.add(txtUsuario);
 		txtUsuario.setColumns(10);
