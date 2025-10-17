@@ -1,6 +1,5 @@
 package Vista;
 
-
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Image;
@@ -13,18 +12,6 @@ import java.awt.Font;
 import javax.swing.UIManager;
 import javax.swing.JTextField;
 import javax.swing.JButton;
-
-import Controlador.controlador;
-import Modelo.Usuario;
-import javax.swing.JOptionPane;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.io.IOException;
-
-// New import for password field
 import javax.swing.JPasswordField;
 
 public class registro extends JFrame {
@@ -32,10 +19,13 @@ public class registro extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtNombre;
-	private JTextField txtApellido; 
+	private JTextField txtApellidos; 
 	private JTextField txtFechaNac;
-	private JTextField txtCorreo;
+	private JTextField txtEmail;
 	private JPasswordField txtPass;
+	private JButton btnRegistrar;
+	private JButton btnVolver;
+	private JLabel lblErrores;
 
 	/**
 	 * Launch the application.
@@ -63,18 +53,18 @@ public class registro extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		 contentPane.setBackground(new Color(0, 0, 0));
+		contentPane.setBackground(new Color(0, 0, 0));
 		
-		 JLabel lblLogo = new JLabel("");
-		 lblLogo.setBounds(369, 11, 174, 165);
+		JLabel lblLogo = new JLabel("");
+		lblLogo.setBounds(369, 11, 174, 165);
 
-		 ImageIcon iconoOriginal = new ImageIcon("media/logo1.png");
-		 Image imagen = iconoOriginal.getImage();
+		ImageIcon iconoOriginal = new ImageIcon("media/logo1.png");
+		Image imagen = iconoOriginal.getImage();
 
-		 Image imagenEscalada = imagen.getScaledInstance(170, 170, Image.SCALE_SMOOTH);
-		 lblLogo.setIcon(new ImageIcon(imagenEscalada));
+		Image imagenEscalada = imagen.getScaledInstance(170, 170, Image.SCALE_SMOOTH);
+		lblLogo.setIcon(new ImageIcon(imagenEscalada));
 
-		 contentPane.add(lblLogo);
+		contentPane.add(lblLogo);
 		
 		JLabel lblRegistrarse = new JLabel("Registrarse");
 		lblRegistrarse.setForeground(UIManager.getColor("Button.highlight"));
@@ -102,19 +92,19 @@ public class registro extends JFrame {
 		contentPane.add(txtNombre);
 		txtNombre.setColumns(10);
 		
-		txtApellido = new JTextField();
-		txtApellido.setColumns(10);
-		txtApellido.setBounds(327, 328, 300, 35);
-		contentPane.add(txtApellido);
+		txtApellidos = new JTextField();
+		txtApellidos.setColumns(10);
+		txtApellidos.setBounds(327, 328, 300, 35);
+		contentPane.add(txtApellidos);
 		
-		JButton btnEntrar = new JButton("Volver");
-		btnEntrar.setForeground(new Color(240, 248, 255));
-		btnEntrar.setFont(new Font("Tahoma", Font.BOLD, 14));
-		btnEntrar.setBackground(new Color(139, 0, 0));
-		btnEntrar.setBounds(10, 11, 89, 41);
-		contentPane.add(btnEntrar);
+		btnVolver = new JButton("Volver");
+		btnVolver.setForeground(new Color(240, 248, 255));
+		btnVolver.setFont(new Font("Tahoma", Font.BOLD, 14));
+		btnVolver.setBackground(new Color(139, 0, 0));
+		btnVolver.setBounds(10, 11, 89, 41);
+		contentPane.add(btnVolver);
 		
-		JButton btnRegistrar = new JButton("Registrarme");
+		btnRegistrar = new JButton("Registrarme");
 		btnRegistrar.setForeground(new Color(240, 248, 255));
 		btnRegistrar.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnRegistrar.setBackground(new Color(139, 0, 0));
@@ -126,10 +116,10 @@ public class registro extends JFrame {
 		txtFechaNac.setBounds(327, 374, 300, 35);
 		contentPane.add(txtFechaNac);
 		
-		txtCorreo = new JTextField();
-		txtCorreo.setColumns(10);
-		txtCorreo.setBounds(327, 420, 300, 35);
-		contentPane.add(txtCorreo);
+		txtEmail = new JTextField();
+		txtEmail.setColumns(10);
+		txtEmail.setBounds(327, 420, 300, 35);
+		contentPane.add(txtEmail);
 		
 		txtPass = new JPasswordField();
 		txtPass.setBounds(327, 466, 300, 35);
@@ -155,72 +145,30 @@ public class registro extends JFrame {
 		lblContrasena.setBackground(Color.WHITE);
 		lblContrasena.setBounds(98, 466, 217, 35);
 		contentPane.add(lblContrasena);
-
-		btnRegistrar.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String nombre = txtNombre.getText().trim();
-				String apellidos = txtApellido.getText().trim();
-				String fechaStr = txtFechaNac.getText().trim();
-				String correo = txtCorreo.getText().trim();
-				String pass = new String(txtPass.getPassword()).trim();
-
-				if (nombre.isEmpty() || apellidos.isEmpty() || correo.isEmpty() || pass.isEmpty()) {
-					JOptionPane.showMessageDialog(registro.this, "Rellena todos los campos obligatorios.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				String emailtipo = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
-				if (!correo.matches(emailtipo)) {
-					JOptionPane.showMessageDialog(registro.this, "Introduce un correo electrónico válido.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				if (pass.length() < 6) {
-					JOptionPane.showMessageDialog(registro.this, "La contraseña debe tener al menos 6 caracteres.", "Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				Date fecha = null;
-				if (!fechaStr.isEmpty()) {
-					// Normalizar separadores y parsear dd-MM-yyyy
-					String normalized = fechaStr.replace('/', '-').trim();
-					SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-					try {
-						fecha = df.parse(normalized);
-					} catch (ParseException pe) {
-						JOptionPane.showMessageDialog(registro.this, "Formato de fecha incorrecto. Usa dd-MM-aaaa (ej: 31-12-1990)", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-				}
-
-				Usuario u = new Usuario(nombre, apellidos, correo, pass, fecha);
-				try {
-					boolean ok = controlador.guardarUsuario(u);
-					if (ok) {
-						JOptionPane.showMessageDialog(registro.this, "Usuario creado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-						
-						registro.this.dispose();
-						login l = new login();
-						l.setVisible(true);
-					} else {
-						JOptionPane.showMessageDialog(registro.this, "Error al crear el usuario. Intenta de nuevo.", "Error", JOptionPane.ERROR_MESSAGE);
-					}
-				} catch (IOException ex) {
-					ex.printStackTrace();
-					JOptionPane.showMessageDialog(registro.this, "Error de conexión: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		});
-
 		
-		btnEntrar.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				registro.this.dispose();
-				login l = new login();
-				l.setVisible(true);
-			}
-		});
+		lblErrores = new JLabel("");
+		lblErrores.setForeground(Color.RED);
+		lblErrores.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblErrores.setBounds(327, 520, 400, 20);
+		contentPane.add(lblErrores);
 	}
+	
+	public void limpiarCampos() {
+		this.txtNombre.setText("");
+		this.txtApellidos.setText("");
+		this.txtFechaNac.setText("");
+		this.txtEmail.setText("");
+		this.txtPass.setText("");
+		this.lblErrores.setText("");
+	}
+
+	// Getters
+	public JTextField getTxtNombre() { return txtNombre; }
+	public JTextField getTxtApellidos() { return txtApellidos; }
+	public JTextField getTxtFechaNac() { return txtFechaNac; }
+	public JTextField getTxtEmail() { return txtEmail; }
+	public JPasswordField getTxtPass() { return txtPass; }
+	public JButton getBtnRegistrar() { return btnRegistrar; }
+	public JButton getBtnVolver() { return btnVolver; }
+	public JLabel getLblErrores() { return lblErrores; }
 }
