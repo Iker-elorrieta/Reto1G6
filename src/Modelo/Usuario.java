@@ -32,7 +32,6 @@ public class Usuario {
 	private static String collectionName = "usuarios";
 	private static String fieldNombre = "nombre";
 	private static String fieldApellidos = "apellidos";
-	private static String fieldEmail = "email";
 	private static String fieldPass = "pass";
 	private static String fieldFechaNacimiento = "fnacimiento";
 	private static String fieldNivel = "nivel";
@@ -129,11 +128,10 @@ public class Usuario {
 				setIdUsuario(usuario.getId());
 				setNombre(usuario.getString(fieldNombre));
 				setApellidos(usuario.getString(fieldApellidos));
-				setEmail(usuario.getString(fieldEmail));
+				setEmail(usuario.getId());
 				setPass(usuario.getString(fieldPass));
 				setNivel(usuario.getDouble(fieldNivel));
 				setTipoUsuario(usuario.getString(fieldTipoUsuario));
-				
 				
 				String fechaStr = usuario.getString(fieldFechaNacimiento);
 				if (fechaStr != null) {
@@ -142,8 +140,10 @@ public class Usuario {
 				}
 			}
 
+			co.close();
+
 		} catch (Exception e) {
-			System.out.println("Error: Clase Usuario, metodo mObtenerUsuario");
+			System.out.println("Error: Clase Usuario");
 			e.printStackTrace();
 		}
 
@@ -165,11 +165,10 @@ public class Usuario {
 				u.setIdUsuario(usuario.getId());
 				u.setNombre(usuario.getString(fieldNombre));
 				u.setApellidos(usuario.getString(fieldApellidos));
-				u.setEmail(usuario.getString(fieldEmail));
+				u.setEmail(usuario.getId());
 				u.setPass(usuario.getString(fieldPass));
 				u.setNivel(usuario.getDouble(fieldNivel));
 				u.setTipoUsuario(usuario.getString(fieldTipoUsuario));
-				
 				
 				String fechaStr = usuario.getString(fieldFechaNacimiento);
 				if (fechaStr != null) {
@@ -182,7 +181,7 @@ public class Usuario {
 			co.close();
 
 		} catch (Exception e) {
-			System.out.println("Error: Clase Usuario, metodo mObtenerUsuarios");
+			System.out.println("Error: Clase Usuarios");
 			e.printStackTrace();
 		}
 
@@ -194,35 +193,39 @@ public class Usuario {
 
 		try {
 			co = Conexion.conectar();
-			
-			
-			ApiFuture<QuerySnapshot> queryFuture = co.collection(collectionName).whereEqualTo(fieldEmail, email).get();
-			QuerySnapshot querySnapshot = queryFuture.get();
-			if (querySnapshot != null && !querySnapshot.isEmpty()) {
+			// Normalizar email a usar como id
+			String emailId = (this.email != null) ? this.email.trim().toLowerCase() : null;
+			if (emailId == null || emailId.isEmpty()) {
+				throw new IOException("Email inválido para crear usuario.");
+			}
+			// Comprobar si ya existe un documento con id = emailId
+			DocumentSnapshot existing = co.collection(collectionName).document(emailId).get().get();
+			if (existing != null && existing.exists()) {
 				throw new IOException("El correo ya está registrado.");
 			}
 
 			Map<String, Object> nuevoUsuario = new HashMap<>();
 			nuevoUsuario.put(fieldNombre, nombre);
 			nuevoUsuario.put(fieldApellidos, apellidos);
-			nuevoUsuario.put(fieldEmail, email);
+			// No guardar el email dentro del documento; se usará como id
 			nuevoUsuario.put(fieldPass, pass);
 			nuevoUsuario.put(fieldNivel, nivel);
 			nuevoUsuario.put(fieldTipoUsuario, tipoUsuario);
 
-			
 			if (fechaNacimiento != null) {
 				SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 				nuevoUsuario.put(fieldFechaNacimiento, df.format(fechaNacimiento));
 			}
 
-			DocumentReference usuarioRef = co.collection(collectionName).document();
-			usuarioRef.set(nuevoUsuario);
+			DocumentReference usuarioRef = co.collection(collectionName).document(emailId);
+			usuarioRef.set(nuevoUsuario).get();
+			// actualizar la propiedad local para reflejar el id usado
+			this.email = emailId;
 			co.close();
 			return true;
 			
 		} catch (Exception e) {
-			System.out.println("Error: Clase Usuario, metodo mAnadirUsuario");
+			System.out.println("Error: Clase Usuario");
 			e.printStackTrace();
 		}
 		return false;
@@ -233,23 +236,24 @@ public class Usuario {
 
 		try {
 			co = Conexion.conectar();
-			ApiFuture<QuerySnapshot> queryFuture = co.collection(collectionName).whereEqualTo(fieldEmail, email).get();
-			QuerySnapshot querySnapshot = queryFuture.get();
-			
-			if (querySnapshot != null && !querySnapshot.isEmpty()) {
-				for (QueryDocumentSnapshot doc : querySnapshot.getDocuments()) {
-					String storedPass = doc.getString(fieldPass);
-					if (storedPass != null && storedPass.equals(pass)) {
-						return true;
-					}
+			String emailId = (email != null) ? email.trim().toLowerCase() : null;
+			if (emailId == null || emailId.isEmpty()) return false;
+			// Obtener documento por id = emailId
+			DocumentSnapshot doc = co.collection(collectionName).document(emailId).get().get();
+			if (doc != null && doc.exists()) {
+				String Pass = doc.getString(fieldPass);
+				co.close();
+				if (Pass != null && Pass.equals(pass)) {
+					return true;
 				}
 			}
 			co.close();
 			
 		} catch (Exception e) {
-			System.out.println("Error: Clase Usuario, metodo mAutenticarUsuario");
+			System.out.println("Error: Clase Usuario");
 			e.printStackTrace();
 		}
 		return false;
 	}
+
 }
