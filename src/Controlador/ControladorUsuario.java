@@ -18,6 +18,8 @@ public class ControladorUsuario implements ActionListener {
 		this.vistaLogin = vistaLogin;
 		this.inicializarControladorLogin();
 	}
+	
+	
 
 	
 	public ControladorUsuario(Vista.registro vistaRegistro) {
@@ -74,15 +76,46 @@ public class ControladorUsuario implements ActionListener {
 			return;
 		}
 
+		String emailId = email.trim().toLowerCase();
 		Usuario usuario = new Usuario();
-		if (usuario.mAutenticarUsuario(email, pass)) {
-			this.vistaLogin.getLblErrores().setText("Login exitoso - Bienvenido al GymApp");
+		if (usuario.mAutenticarUsuario(emailId, pass)) {
+	
+			usuario = usuario.mObtenerUsuario(emailId);
+
+
+			Vista.menu ventanaMenu = new Vista.menu();
+			String nombreParaMostrar = (usuario.getNombre() != null && !usuario.getNombre().isEmpty()) ? usuario.getNombre() : usuario.getEmail();
+			ventanaMenu.setBienvenido(nombreParaMostrar);
+			ventanaMenu.setNivelText(String.valueOf(usuario.getNivel()));
+
+			
+			ventanaMenu.setVisible(true);
+
+			
+			this.vistaLogin.setVisible(false);
+			this.vistaLogin.dispose();
+
+			
+			ventanaMenu.getBtnCerrarSesion().addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					ventanaMenu.setVisible(false);
+					ventanaMenu.dispose();				
+					Vista.login ventanaLogin = new Vista.login();
+					ventanaLogin.setVisible(true);
+					new ControladorUsuario(ventanaLogin);
+				}
+			});
+
 		
 			this.vistaLogin.limpiarCampos();
+
+			this.vistaLogin.getLblErrores().setText("Login exitoso - Bienvenido al GymApp");
 		} else {
 			this.vistaLogin.getLblErrores().setText("Credenciales incorrectas");
 		}
 	}
+	
 
 	private void mAbrirRegistro() {
 		this.vistaLogin.setVisible(false);

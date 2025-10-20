@@ -18,6 +18,9 @@ public class menu extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JButton btnPerfil;
+	private JButton btnCerrarSesion; 
+	private JLabel lblbienvenido; 
+	private JLabel lblNivel; 
 
 	/**
 	 * Launch the application.
@@ -65,14 +68,14 @@ public class menu extends JFrame {
 		lblMenu.setBounds(423, 34, 91, 41);
 		contentPane.add(lblMenu);
 		
-		JLabel lblbienvenido = new JLabel("Bienvenido, ");
+		lblbienvenido = new JLabel("Bienvenido, ");
 		lblbienvenido.setForeground(Color.WHITE);
 		lblbienvenido.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblbienvenido.setBackground(Color.WHITE);
 		lblbienvenido.setBounds(308, 109, 330, 41);
 		contentPane.add(lblbienvenido);
 		
-		JLabel lblNivel = new JLabel("Tu nivel es: ");
+		lblNivel = new JLabel("Tu nivel es: ");
 		lblNivel.setForeground(new Color(128, 0, 0));
 		lblNivel.setFont(new Font("Tahoma", Font.BOLD, 26));
 		lblNivel.setBackground(Color.WHITE);
@@ -100,7 +103,8 @@ public class menu extends JFrame {
 		btnHistorico.setBounds(324, 288, 237, 41);
 		contentPane.add(btnHistorico);
 		
-		JButton btnCerrarSesion = new JButton("Cerrar sesión");
+	
+		btnCerrarSesion = new JButton("Cerrar sesión");
 		btnCerrarSesion.setForeground(new Color(240, 248, 255));
 		btnCerrarSesion.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnCerrarSesion.setBackground(new Color(139, 0, 0));
@@ -108,4 +112,18 @@ public class menu extends JFrame {
 		contentPane.add(btnCerrarSesion);
 
 	}
+
+	
+	public void setBienvenido(String nombre) {
+		this.lblbienvenido.setText("Bienvenido, " + nombre);
+	}
+
+	public void setNivelText(String nivel) {
+		this.lblNivel.setText("Tu nivel es: " + nivel);
+	}
+
+	public JButton getBtnPerfil() { return btnPerfil; }
+	public JButton getBtnCerrarSesion() { return btnCerrarSesion; }
+	public JLabel getLblbienvenido() { return lblbienvenido; }
+	public JLabel getLblNivel() { return lblNivel; }
 }

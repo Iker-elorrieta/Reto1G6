@@ -130,7 +130,12 @@ public class Usuario {
 				setApellidos(usuario.getString(fieldApellidos));
 				setEmail(usuario.getId());
 				setPass(usuario.getString(fieldPass));
-				setNivel(usuario.getDouble(fieldNivel));
+				Double nivelObj = usuario.getDouble(fieldNivel);
+				if (nivelObj != null) {
+					setNivel(nivelObj);
+				} else {
+					setNivel(0);
+				}
 				setTipoUsuario(usuario.getString(fieldTipoUsuario));
 				
 				String fechaStr = usuario.getString(fieldFechaNacimiento);
@@ -167,7 +172,12 @@ public class Usuario {
 				u.setApellidos(usuario.getString(fieldApellidos));
 				u.setEmail(usuario.getId());
 				u.setPass(usuario.getString(fieldPass));
-				u.setNivel(usuario.getDouble(fieldNivel));
+				Double nivelObj = usuario.getDouble(fieldNivel);
+				if (nivelObj != null) {
+					u.setNivel(nivelObj);
+				} else {
+					u.setNivel(0);
+				}
 				u.setTipoUsuario(usuario.getString(fieldTipoUsuario));
 				
 				String fechaStr = usuario.getString(fieldFechaNacimiento);
