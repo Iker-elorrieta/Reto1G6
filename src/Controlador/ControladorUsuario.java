@@ -12,6 +12,9 @@ public class ControladorUsuario implements ActionListener {
 
 	private Vista.login vistaLogin;
 	private Vista.registro vistaRegistro;
+	private Vista.menu vistaMenu;
+	private Vista.perfil vistaPerfil;
+	private Usuario usuarioActual;
 
 
 	public ControladorUsuario(Vista.login vistaLogin) {
@@ -25,6 +28,21 @@ public class ControladorUsuario implements ActionListener {
 	public ControladorUsuario(Vista.registro vistaRegistro) {
 		this.vistaRegistro = vistaRegistro;
 		this.inicializarControladorRegistro();
+	}
+
+	// New constructor for menu view with current user
+	public ControladorUsuario(Vista.menu vistaMenu, Usuario usuario) {
+		this.vistaMenu = vistaMenu;
+		this.usuarioActual = usuario;
+		this.inicializarControladorMenu();
+	}
+
+	// New constructor for perfil view (needs reference to menu to return)
+	public ControladorUsuario(Vista.perfil vistaPerfil, Vista.menu vistaMenu, Usuario usuario) {
+		this.vistaPerfil = vistaPerfil;
+		this.vistaMenu = vistaMenu;
+		this.usuarioActual = usuario;
+		this.inicializarControladorPerfil();
 	}
 
 	private void inicializarControladorLogin() {
@@ -45,6 +63,24 @@ public class ControladorUsuario implements ActionListener {
 		this.vistaRegistro.getBtnVolver().setActionCommand("VOLVER_LOGIN");
 	}
 
+	// Initialize menu listeners (open perfil, cerrar sesion...)
+	private void inicializarControladorMenu() {
+		this.vistaMenu.getBtnPerfil().addActionListener(this);
+		this.vistaMenu.getBtnPerfil().setActionCommand("ABRIR_PERFIL");
+
+		this.vistaMenu.getBtnCerrarSesion().addActionListener(this);
+		this.vistaMenu.getBtnCerrarSesion().setActionCommand("CERRAR_SESION");
+	}
+
+	// Initialize perfil listeners (volver a menu)
+	private void inicializarControladorPerfil() {
+		// Fill profile view with user data
+		this.vistaPerfil.setearUsuario(this.usuarioActual);
+
+		this.vistaPerfil.getBtnVolver().addActionListener(this);
+		this.vistaPerfil.getBtnVolver().setActionCommand("VOLVER_MENU");
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String comando = e.getActionCommand();
@@ -61,6 +97,15 @@ public class ControladorUsuario implements ActionListener {
 			break;
 		case "VOLVER_LOGIN":
 			this.mVolverLogin();
+			break;
+		case "ABRIR_PERFIL":
+			this.mAbrirPerfil();
+			break;
+		case "CERRAR_SESION":
+			this.mCerrarSesion();
+			break;
+		case "VOLVER_MENU":
+			this.mVolverAMenu();
 			break;
 		default:
 			break;
@@ -95,19 +140,10 @@ public class ControladorUsuario implements ActionListener {
 			this.vistaLogin.setVisible(false);
 			this.vistaLogin.dispose();
 
-			
-			ventanaMenu.getBtnCerrarSesion().addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					ventanaMenu.setVisible(false);
-					ventanaMenu.dispose();				
-					Vista.login ventanaLogin = new Vista.login();
-					ventanaLogin.setVisible(true);
-					new ControladorUsuario(ventanaLogin);
-				}
-			});
+			// Create a controller for the menu and pass the authenticated user
+			new ControladorUsuario(ventanaMenu, usuario);
 
-		
+			// Clean login fields and show success
 			this.vistaLogin.limpiarCampos();
 
 			this.vistaLogin.getLblErrores().setText("Login exitoso - Bienvenido al GymApp");
@@ -116,6 +152,39 @@ public class ControladorUsuario implements ActionListener {
 		}
 	}
 	
+	// Open perfil from menu
+	private void mAbrirPerfil() {
+		// usuarioActual should be set when this controller was created for the menu
+		if (this.usuarioActual == null || this.vistaMenu == null) return;
+
+		this.vistaMenu.setVisible(false);
+		
+		Vista.perfil ventanaPerfil = new Vista.perfil();
+		// Create perfil controller which will fill the view
+		new ControladorUsuario(ventanaPerfil, this.vistaMenu, this.usuarioActual);
+		ventanaPerfil.setVisible(true);
+	}
+
+	private void mCerrarSesion() {
+		if (this.vistaMenu != null) {
+			this.vistaMenu.setVisible(false);
+			this.vistaMenu.dispose();
+		}
+		Vista.login ventanaLogin = new Vista.login();
+		ventanaLogin.setVisible(true);
+		new ControladorUsuario(ventanaLogin);
+	}
+
+	// Called from perfil controller when pressing volver
+	private void mVolverAMenu() {
+		if (this.vistaPerfil != null) {
+			this.vistaPerfil.setVisible(false);
+			this.vistaPerfil.dispose();
+		}
+		if (this.vistaMenu != null) {
+			this.vistaMenu.setVisible(true);
+		}
+	}
 
 	private void mAbrirRegistro() {
 		this.vistaLogin.setVisible(false);

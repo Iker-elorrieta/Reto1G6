@@ -162,7 +162,7 @@ public class registro extends JFrame {
 		this.lblErrores.setText("");
 	}
 
-	// Getters
+	
 	public JTextField getTxtNombre() { return txtNombre; }
 	public JTextField getTxtApellidos() { return txtApellidos; }
 	public JTextField getTxtFechaNac() { return txtFechaNac; }
