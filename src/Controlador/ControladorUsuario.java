@@ -14,6 +14,7 @@ public class ControladorUsuario implements ActionListener {
 	private Vista.registro vistaRegistro;
 	private Vista.menu vistaMenu;
 	private Vista.perfil vistaPerfil;
+	private Vista.workouts vistaWorkouts;
 	private Usuario usuarioActual;
 
 
@@ -65,6 +66,10 @@ public class ControladorUsuario implements ActionListener {
 
 		this.vistaMenu.getBtnCerrarSesion().addActionListener(this);
 		this.vistaMenu.getBtnCerrarSesion().setActionCommand("CERRAR_SESION");
+
+		// Botón para abrir pantalla de workouts
+		this.vistaMenu.getBtnEmpezar().addActionListener(this);
+		this.vistaMenu.getBtnEmpezar().setActionCommand("ABRIR_WORKOUTS");
 	}
 
 	private void inicializarControladorPerfil() {
@@ -78,6 +83,20 @@ public class ControladorUsuario implements ActionListener {
 		this.vistaPerfil.getBtnCambiarDatos().setActionCommand("CAMBIAR_DATOS");
 	}
 
+    // Inicializador para la vista workouts
+    private void inicializarControladorWorkouts() {
+
+        this.vistaWorkouts.getBtnVolver().addActionListener(this);
+        this.vistaWorkouts.getBtnVolver().setActionCommand("VOLVER_WORKOUTS");
+    }
+    
+    // Nuevo constructor para manejar workouts
+    public ControladorUsuario(Vista.workouts vistaWorkouts, Vista.menu vistaMenu) {
+        this.vistaWorkouts = vistaWorkouts;
+        this.vistaMenu = vistaMenu;
+        this.inicializarControladorWorkouts();
+    }
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String comando = e.getActionCommand();
@@ -86,6 +105,10 @@ public class ControladorUsuario implements ActionListener {
 			this.mLoginUsuario();
 		} else if ("CAMBIAR_DATOS".equals(comando)) {
 			this.mCambiarDatos();
+	    } else if ("ABRIR_WORKOUTS".equals(comando)) {
+	        this.mAbrirWorkouts();
+	    } else if ("VOLVER_WORKOUTS".equals(comando)) {
+	        this.mVolverDesdeWorkouts();
 		} else if ("ABRIR_REGISTRO".equals(comando)) {
 			this.mAbrirRegistro();
 		} else if ("REGISTRAR_USUARIO".equals(comando)) {
@@ -283,4 +306,25 @@ public class ControladorUsuario implements ActionListener {
         this.vistaPerfil.getLblErrores().setText("Error al actualizar usuario en servidor");
     }
 }
+
+    private void mAbrirWorkouts() {
+
+  
+        Vista.workouts ventanaWorkouts = new Vista.workouts();
+
+        this.vistaMenu.setVisible(false);
+
+        ventanaWorkouts.setVisible(true);
+        new ControladorUsuario(ventanaWorkouts, this.vistaMenu);
+    }
+
+    private void mVolverDesdeWorkouts() {
+        if (this.vistaWorkouts != null) {
+            this.vistaWorkouts.setVisible(false);
+            this.vistaWorkouts.dispose();
+        }
+        if (this.vistaMenu != null) {
+            this.vistaMenu.setVisible(true);
+        }
+    }
 }

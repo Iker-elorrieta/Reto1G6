@@ -22,6 +22,7 @@ public class menu extends JFrame {
 	private JButton btnCerrarSesion; 
 	private JLabel lblbienvenido; 
 	private JLabel lblNivel; 
+	private JButton btnEmpezar;
 
 	/**
 	 * Launch the application.
@@ -90,7 +91,7 @@ public class menu extends JFrame {
 		btnPerfil.setBounds(775, 34, 89, 41);
 		contentPane.add(btnPerfil);
 		
-		JButton btnEmpezar = new JButton("Empezar entrenamiento");
+		btnEmpezar = new JButton("Empezar entrenamiento");
 		btnEmpezar.setForeground(new Color(240, 248, 255));
 		btnEmpezar.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnEmpezar.setBackground(new Color(139, 0, 0));
@@ -132,6 +133,7 @@ public class menu extends JFrame {
 	}
 
 	public JButton getBtnPerfil() { return btnPerfil; }
+	public JButton getBtnEmpezar() { return btnEmpezar; }
 	public JButton getBtnCerrarSesion() { return btnCerrarSesion; }
 	public JLabel getLblbienvenido() { return lblbienvenido; }
 	public JLabel getLblNivel() { return lblNivel; }
