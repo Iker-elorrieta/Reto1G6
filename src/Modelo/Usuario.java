@@ -217,7 +217,6 @@ public class Usuario {
 			Map<String, Object> nuevoUsuario = new HashMap<>();
 			nuevoUsuario.put(fieldNombre, nombre);
 			nuevoUsuario.put(fieldApellidos, apellidos);
-			// No guardar el email dentro del documento; se usará como id
 			nuevoUsuario.put(fieldPass, pass);
 			nuevoUsuario.put(fieldNivel, nivel);
 			nuevoUsuario.put(fieldTipoUsuario, tipoUsuario);
@@ -229,7 +228,6 @@ public class Usuario {
 
 			DocumentReference usuarioRef = co.collection(collectionName).document(emailId);
 			usuarioRef.set(nuevoUsuario).get();
-			// actualizar la propiedad local para reflejar el id usado
 			this.email = emailId;
 			co.close();
 			return true;
@@ -261,6 +259,42 @@ public class Usuario {
 			
 		} catch (Exception e) {
 			System.out.println("Error: Clase Usuario");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	// Nuevo método: actualizar los datos del usuario existente en Firestore
+	public boolean mActualizarUsuario() {
+		Firestore co = null;
+
+		try {
+			co = Conexion.conectar();
+			String emailId = (this.email != null) ? this.email.trim().toLowerCase() : null;
+			if (emailId == null || emailId.isEmpty()) {
+				throw new IOException("Email inválido para actualizar usuario.");
+			}
+
+			Map<String, Object> updates = new HashMap<>();
+			// Actualizamos sólo los campos que manejamos en la vista de perfil
+			updates.put(fieldNombre, this.nombre);
+			updates.put(fieldApellidos, this.apellidos);
+			updates.put(fieldPass, this.pass);
+			updates.put(fieldNivel, this.nivel);
+			updates.put(fieldTipoUsuario, this.tipoUsuario);
+
+			if (this.fechaNacimiento != null) {
+				SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+				updates.put(fieldFechaNacimiento, df.format(this.fechaNacimiento));
+			}
+
+			DocumentReference usuarioRef = co.collection(collectionName).document(emailId);
+			// Usamos update para mantener otros campos que puedan existir
+			usuarioRef.update(updates).get();
+			co.close();
+			return true;
+		} catch (Exception e) {
+			System.out.println("Error: mActualizarUsuario en Usuario");
 			e.printStackTrace();
 		}
 		return false;

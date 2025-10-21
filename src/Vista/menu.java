@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
+import java.text.DecimalFormat;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -119,7 +120,15 @@ public class menu extends JFrame {
 	}
 
 	public void setNivelText(String nivel) {
-		this.lblNivel.setText("Tu nivel es: " + nivel);
+		try {
+			double v = Double.parseDouble(nivel);
+			DecimalFormat df = new DecimalFormat("#.##");
+			String formatted = df.format(v);
+			this.lblNivel.setText("Tu nivel es: " + formatted);
+		} catch (NumberFormatException ex) {
+			// Si no es un número, mostramos tal cual
+			this.lblNivel.setText("Tu nivel es: " + nivel);
+		}
 	}
 
 	public JButton getBtnPerfil() { return btnPerfil; }

@@ -23,21 +23,17 @@ public class ControladorUsuario implements ActionListener {
 	}
 	
 	
-
-	
 	public ControladorUsuario(Vista.registro vistaRegistro) {
 		this.vistaRegistro = vistaRegistro;
 		this.inicializarControladorRegistro();
 	}
 
-	// New constructor for menu view with current user
 	public ControladorUsuario(Vista.menu vistaMenu, Usuario usuario) {
 		this.vistaMenu = vistaMenu;
 		this.usuarioActual = usuario;
 		this.inicializarControladorMenu();
 	}
 
-	// New constructor for perfil view (needs reference to menu to return)
 	public ControladorUsuario(Vista.perfil vistaPerfil, Vista.menu vistaMenu, Usuario usuario) {
 		this.vistaPerfil = vistaPerfil;
 		this.vistaMenu = vistaMenu;
@@ -63,7 +59,6 @@ public class ControladorUsuario implements ActionListener {
 		this.vistaRegistro.getBtnVolver().setActionCommand("VOLVER_LOGIN");
 	}
 
-	// Initialize menu listeners (open perfil, cerrar sesion...)
 	private void inicializarControladorMenu() {
 		this.vistaMenu.getBtnPerfil().addActionListener(this);
 		this.vistaMenu.getBtnPerfil().setActionCommand("ABRIR_PERFIL");
@@ -72,43 +67,37 @@ public class ControladorUsuario implements ActionListener {
 		this.vistaMenu.getBtnCerrarSesion().setActionCommand("CERRAR_SESION");
 	}
 
-	// Initialize perfil listeners (volver a menu)
 	private void inicializarControladorPerfil() {
-		// Fill profile view with user data
 		this.vistaPerfil.setearUsuario(this.usuarioActual);
 
 		this.vistaPerfil.getBtnVolver().addActionListener(this);
 		this.vistaPerfil.getBtnVolver().setActionCommand("VOLVER_MENU");
+
+	
+		this.vistaPerfil.getBtnCambiarDatos().addActionListener(this);
+		this.vistaPerfil.getBtnCambiarDatos().setActionCommand("CAMBIAR_DATOS");
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String comando = e.getActionCommand();
 
-		switch (comando) {
-		case "LOGIN_USUARIO":
+		if ("LOGIN_USUARIO".equals(comando)) {
 			this.mLoginUsuario();
-			break;
-		case "ABRIR_REGISTRO":
+		} else if ("CAMBIAR_DATOS".equals(comando)) {
+			this.mCambiarDatos();
+		} else if ("ABRIR_REGISTRO".equals(comando)) {
 			this.mAbrirRegistro();
-			break;
-		case "REGISTRAR_USUARIO":
+		} else if ("REGISTRAR_USUARIO".equals(comando)) {
 			this.mRegistrarUsuario();
-			break;
-		case "VOLVER_LOGIN":
+		} else if ("VOLVER_LOGIN".equals(comando)) {
 			this.mVolverLogin();
-			break;
-		case "ABRIR_PERFIL":
+		} else if ("ABRIR_PERFIL".equals(comando)) {
 			this.mAbrirPerfil();
-			break;
-		case "CERRAR_SESION":
+		} else if ("CERRAR_SESION".equals(comando)) {
 			this.mCerrarSesion();
-			break;
-		case "VOLVER_MENU":
+		} else if ("VOLVER_MENU".equals(comando)) {
 			this.mVolverAMenu();
-			break;
-		default:
-			break;
 		}
 	}
 
@@ -140,10 +129,8 @@ public class ControladorUsuario implements ActionListener {
 			this.vistaLogin.setVisible(false);
 			this.vistaLogin.dispose();
 
-			// Create a controller for the menu and pass the authenticated user
 			new ControladorUsuario(ventanaMenu, usuario);
 
-			// Clean login fields and show success
 			this.vistaLogin.limpiarCampos();
 
 			this.vistaLogin.getLblErrores().setText("Login exitoso - Bienvenido al GymApp");
@@ -152,15 +139,15 @@ public class ControladorUsuario implements ActionListener {
 		}
 	}
 	
-	// Open perfil from menu
+
 	private void mAbrirPerfil() {
-		// usuarioActual should be set when this controller was created for the menu
+		
 		if (this.usuarioActual == null || this.vistaMenu == null) return;
 
 		this.vistaMenu.setVisible(false);
 		
 		Vista.perfil ventanaPerfil = new Vista.perfil();
-		// Create perfil controller which will fill the view
+		
 		new ControladorUsuario(ventanaPerfil, this.vistaMenu, this.usuarioActual);
 		ventanaPerfil.setVisible(true);
 	}
@@ -175,7 +162,7 @@ public class ControladorUsuario implements ActionListener {
 		new ControladorUsuario(ventanaLogin);
 	}
 
-	// Called from perfil controller when pressing volver
+	
 	private void mVolverAMenu() {
 		if (this.vistaPerfil != null) {
 			this.vistaPerfil.setVisible(false);
@@ -249,4 +236,51 @@ public class ControladorUsuario implements ActionListener {
 		ventanaLogin.setVisible(true);
 		new ControladorUsuario(ventanaLogin);
 	}
+
+	private void mCambiarDatos() {
+    if (this.vistaPerfil == null || this.usuarioActual == null) return;
+
+    String nombre = this.vistaPerfil.getTxtNombre().getText().trim();
+    String apellidos = this.vistaPerfil.getTxtApellidos().getText().trim();
+    String fechaNacStr = this.vistaPerfil.getTxtFechaNac().getText().trim();
+    String pass = new String(this.vistaPerfil.getTxtPass().getPassword()).trim();
+
+    if (nombre.isEmpty() || apellidos.isEmpty()) {
+        this.vistaPerfil.getLblErrores().setText("Nombre y apellidos son obligatorios");
+        return;
+    }
+
+  
+    java.util.Date fechaNacimiento = null;
+    if (!fechaNacStr.isEmpty()) {
+        try {
+            String normalized = fechaNacStr.replace('/', '-').trim();
+            java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("dd-MM-yyyy");
+            fechaNacimiento = df.parse(normalized);
+        } catch (java.text.ParseException pe) {
+            this.vistaPerfil.getLblErrores().setText("Formato de fecha incorrecto. Usa dd-MM-aaaa");
+            return;
+        }
+    }
+
+ 
+    this.usuarioActual.setNombre(nombre);
+    this.usuarioActual.setApellidos(apellidos);
+    if (!pass.isEmpty()) {
+        this.usuarioActual.setPass(pass);
+    }
+    this.usuarioActual.setFechaNacimiento(fechaNacimiento);
+
+    boolean ok = this.usuarioActual.mActualizarUsuario();
+    if (ok) {
+        this.vistaPerfil.getLblErrores().setText("Datos actualizados correctamente");
+        if (this.vistaMenu != null) {
+            String nombreParaMostrar = (this.usuarioActual.getNombre() != null && !this.usuarioActual.getNombre().isEmpty()) ? this.usuarioActual.getNombre() : this.usuarioActual.getEmail();
+            this.vistaMenu.setBienvenido(nombreParaMostrar);
+            this.vistaMenu.setNivelText(String.valueOf(this.usuarioActual.getNivel()));
+        }
+    } else {
+        this.vistaPerfil.getLblErrores().setText("Error al actualizar usuario en servidor");
+    }
+}
 }

@@ -25,7 +25,6 @@ public class perfil extends JFrame {
 	private JTextField txtNombre;
 	private JTextField txtApellidos; 
 	private JTextField txtFechaNac;
-	private JTextField txtEmail;
 	private JPasswordField txtPass;
 	private JButton btnCambiarDatos;
 	private JButton btnVolver;
@@ -90,13 +89,8 @@ public class perfil extends JFrame {
 		txtFechaNac.setBounds(327, 374, 300, 35);
 		contentPane.add(txtFechaNac);
 		
-		txtEmail = new JTextField();
-		txtEmail.setColumns(10);
-		txtEmail.setBounds(327, 420, 300, 35);
-		contentPane.add(txtEmail);
-		
 		txtPass = new JPasswordField();
-		txtPass.setBounds(327, 466, 300, 35);
+		txtPass.setBounds(327, 420, 300, 35);
 		contentPane.add(txtPass);
 		
 		JLabel lblFNacimiento = new JLabel("F. Nacimiento:");
@@ -106,25 +100,18 @@ public class perfil extends JFrame {
 		lblFNacimiento.setBounds(98, 374, 217, 35);
 		contentPane.add(lblFNacimiento);
 		
-		JLabel lblCorreo = new JLabel("Correo:");
-		lblCorreo.setForeground(Color.WHITE);
-		lblCorreo.setFont(new Font("Tahoma", Font.PLAIN, 27));
-		lblCorreo.setBackground(Color.WHITE);
-		lblCorreo.setBounds(98, 420, 217, 35);
-		contentPane.add(lblCorreo);
-		
 		JLabel lblContrasena = new JLabel("Contraseña:");
 		lblContrasena.setForeground(Color.WHITE);
 		lblContrasena.setFont(new Font("Tahoma", Font.PLAIN, 27));
 		lblContrasena.setBackground(Color.WHITE);
-		lblContrasena.setBounds(98, 466, 217, 35);
+		lblContrasena.setBounds(98, 420, 217, 35);
 		contentPane.add(lblContrasena);
 		
 		btnCambiarDatos = new JButton("Cambiar datos");
 		btnCambiarDatos.setForeground(new Color(240, 248, 255));
 		btnCambiarDatos.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnCambiarDatos.setBackground(new Color(139, 0, 0));
-		btnCambiarDatos.setBounds(354, 516, 237, 41);
+		btnCambiarDatos.setBounds(358, 474, 237, 41);
 		contentPane.add(btnCambiarDatos);
 		
 		btnVolver = new JButton("Volver");
@@ -163,13 +150,6 @@ public class perfil extends JFrame {
 
 			txtFechaNac.setText(formatearFecha(u.getFechaNacimiento()));
 
-			String email = u.getEmail();
-			if (email == null) {
-				email = "";
-			}
-			txtEmail.setText(email);
-
-	
 			String pass = u.getPass();
 			if (pass == null) {
 				pass = "";
@@ -191,7 +171,6 @@ public class perfil extends JFrame {
          txtNombre.setText("");
          txtApellidos.setText("");
          txtFechaNac.setText("");
-         txtEmail.setText("");
          txtPass.setText("");
      }
 
@@ -199,7 +178,6 @@ public class perfil extends JFrame {
      public JTextField getTxtNombre() { return txtNombre; }
      public JTextField getTxtApellidos() { return txtApellidos; }
      public JTextField getTxtFechaNac() { return txtFechaNac; }
-     public JTextField getTxtEmail() { return txtEmail; }
      public JPasswordField getTxtPass() { return txtPass; }
      public JButton getBtnCambiarDatos() { return btnCambiarDatos; }
      public JButton getBtnVolver() { return btnVolver; }
