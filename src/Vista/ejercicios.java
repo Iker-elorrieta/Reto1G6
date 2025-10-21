@@ -64,7 +64,7 @@ public class ejercicios extends JFrame {
 		lblEjercicios.setForeground(Color.WHITE);
 		lblEjercicios.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblEjercicios.setBackground(Color.WHITE);
-		lblEjercicios.setBounds(350, 76, 191, 35);
+		lblEjercicios.setBounds(350, 87, 191, 35);
 		contentPane.add(lblEjercicios);
 		
 		
