@@ -18,7 +18,7 @@ import javax.swing.table.DefaultTableModel;
 import Modelo.Ejercicio;
 import Modelo.Serie;
 import Modelo.Usuario;
-import Modelo.Workouts;
+import Modelo.Workout;
 
 public class ControladorUsuario implements ActionListener {
 
@@ -104,11 +104,11 @@ public class ControladorUsuario implements ActionListener {
 
         // Poblar tabla de workouts
         try {
-            ArrayList<Workouts> lista = Workouts.mObtenerWorkouts();
+            ArrayList<Workout> lista = Workout.mObtenerWorkouts();
             DefaultTableModel model = (DefaultTableModel) this.vistaWorkouts.getTableWorkouts().getModel();
             // limpiar
             model.setRowCount(0);
-            for (Workouts w : lista) {
+            for (Workout w : lista) {
                 // agregar solo workouts que el usuario pueda ver (propietario o nivel suficiente)
                 boolean permitido = false;
                 if (this.usuarioActual != null) {
@@ -391,7 +391,7 @@ public class ControladorUsuario implements ActionListener {
             this.vistaMenu.setVisible(true);
         }
     }
-
+    // REVISAR EL CONTENIDO GENERADO POR LA IA,ASEGURARSE QUE SE CAMBIA/COMPRENDE LOS EXCEPTION RAROS 
     // Abrir la vista de ejercicios para un workout concreto
     private void mAbrirEjercicios(String workoutId) {
         try {

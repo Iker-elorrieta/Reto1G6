@@ -9,7 +9,7 @@ import com.google.cloud.firestore.QuerySnapshot;
 
 import conexion.Conexion;
 
-public class Ejercicio extends Workouts {
+public class Ejercicio extends Workout {
     
     private String Nombre; //sera usado como id
     private String Descripcion;
