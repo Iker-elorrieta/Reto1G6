@@ -11,12 +11,18 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JTable;
+import javax.swing.JScrollPane;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.border.LineBorder;
+import javax.swing.ListSelectionModel;
 
 public class workouts extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JButton btnVolver;
+	private JTable tableWorkouts;
 	/**
 	 * Launch the application.
 	 */
@@ -60,7 +66,7 @@ public class workouts extends JFrame {
 		lblWorkouts.setForeground(Color.WHITE);
 		lblWorkouts.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblWorkouts.setBackground(Color.WHITE);
-		lblWorkouts.setBounds(349, 32, 179, 35);
+		lblWorkouts.setBounds(349, 67, 179, 35);
 		contentPane.add(lblWorkouts);
 		
 		
@@ -68,9 +74,38 @@ public class workouts extends JFrame {
 		btnVolver.setForeground(new Color(240, 248, 255));
 		btnVolver.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnVolver.setBackground(new Color(139, 0, 0));
-		btnVolver.setBounds(50, 538, 119, 41);
+		btnVolver.setBounds(50, 508, 119, 41);
 		contentPane.add(btnVolver);
+		
+		JScrollPane scrollPaneWorkouts = new JScrollPane();
+		scrollPaneWorkouts.setBounds(50, 260, 794, 158);
+		contentPane.add(scrollPaneWorkouts);
+		
+		tableWorkouts = new JTable();
+		tableWorkouts.setBorder(new LineBorder(new Color(128, 0, 0), 3, true));
+		tableWorkouts.setModel(new DefaultTableModel(new Object[][] {
+				{null, null, null, null},
+				{null, null, null, null},
+				{null, null, null, null},
+				{null, null, null, null},
+				{null, null, null, null},
+				{null, null, null, null},
+			}, new String[] { "Nombre", "Nivel", "Duraci\u00F3n", "Video" }) {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false; // make all cells non-editable
+			}
+		});
+		// Ensure single selection so double-click targets a single workout
+		tableWorkouts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tableWorkouts.getColumnModel().getColumn(0).setPreferredWidth(288);
+		tableWorkouts.getColumnModel().getColumn(1).setPreferredWidth(46);
+		tableWorkouts.getColumnModel().getColumn(2).setPreferredWidth(59);
+		tableWorkouts.getColumnModel().getColumn(3).setPreferredWidth(229);
+		scrollPaneWorkouts.setViewportView(tableWorkouts);
 
 	}
 	public JButton getBtnVolver() { return btnVolver; }
+	public JTable getTableWorkouts() { return tableWorkouts; }
 }

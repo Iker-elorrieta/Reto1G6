@@ -14,6 +14,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JTable;
 import javax.swing.border.LineBorder;
 import javax.swing.JScrollPane;
+import javax.swing.table.DefaultTableModel;
 
 public class ejercicios extends JFrame {
 
@@ -21,6 +22,8 @@ public class ejercicios extends JFrame {
 	private JPanel contentPane;
 	private JButton btnVolver;
 	private JTable table;
+	private JLabel lblDescripcion;
+	private JLabel lblImg;
 	/**
 	 * Launch the application.
 	 */
@@ -64,7 +67,7 @@ public class ejercicios extends JFrame {
 		lblEjercicios.setForeground(Color.WHITE);
 		lblEjercicios.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblEjercicios.setBackground(Color.WHITE);
-		lblEjercicios.setBounds(350, 87, 191, 35);
+		lblEjercicios.setBounds(350, 76, 191, 35);
 		contentPane.add(lblEjercicios);
 		
 		
@@ -76,14 +79,40 @@ public class ejercicios extends JFrame {
 		contentPane.add(btnVolver);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(72, 187, 753, 316);
+		scrollPane.setBounds(73, 187, 753, 75);
 		contentPane.add(scrollPane);
 		
 		table = new JTable();
-		scrollPane.setColumnHeaderView(table);
-		table.setBorder(new LineBorder(new Color(128, 0, 0), 4));
-		table.setBackground(new Color(255, 204, 204));
+		table.setBorder(new LineBorder(new Color(128, 0, 0), 3, true));
+		table.setModel(new DefaultTableModel(
+			new Object[][] {
+				{null, null, null, null, null},
+				{null, null, null, null, null},
+				{null, null, null, null, null},
+			},
+			new String[] {
+				"Nombre", "Duraci\u00F3n", "Series", "T. Descanso", "T. Serie"
+			}
+		));
+		table.getColumnModel().getColumn(0).setPreferredWidth(220);
+		table.getColumnModel().getColumn(1).setPreferredWidth(104);
+		table.getColumnModel().getColumn(2).setPreferredWidth(108);
+		table.getColumnModel().getColumn(3).setPreferredWidth(100);
+		table.getColumnModel().getColumn(4).setPreferredWidth(91);
+		scrollPane.setViewportView(table);
+		
+		lblDescripcion = new JLabel("");
+		lblDescripcion.setForeground(new Color(240, 248, 255));
+		lblDescripcion.setBounds(74, 292, 753, 75);
+		contentPane.add(lblDescripcion);
+		
+		lblImg = new JLabel("");
+		lblImg.setBounds(312, 355, 293, 224);
+		contentPane.add(lblImg);
 
 	}
 	public JButton getBtnVolver() { return btnVolver; }
+	public JTable getTableEjercicios() { return table; }
+	public JLabel getLblDescripcion() { return lblDescripcion; }
+	public JLabel getLblImg() { return lblImg; }
 }
