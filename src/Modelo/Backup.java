@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.io.IOException;
 import java.io.File;
 
+import LecturaPB.lectura; // delegamos en la clase lectura para crear los .dat
+
 public class Backup {
 
 	public static void main(String[] args) {
@@ -35,19 +37,17 @@ public class Backup {
 		}
 	
 	
-	//Para llamar la clase lectura y guardar los datos en los archivos .dat
-
-	try {
-		ProcessBuilder pb = new ProcessBuilder("java", "LecturaPB.lectura");
-		pb.directory(new File("bin"));
-	Process proces = pb.start();
-		proces.getOutputStream().write((+"\n").getBytes());
-		proces.getOutputStream().flush();
-
-
-		}
-	} catch (IOException e) {
-		e.printStackTrace();
+HiloBackup hb = new HiloBackup();
+	hb.start();
 	}
+
+	// Métodos auxiliares simples que delegan en LecturaPB.lectura
+	public static void guardarUsuarios(ArrayList<Usuario> usuarios) {
+		lectura.guardarUsuarios(usuarios);
 	}
+
+	public static void guardarWorkouts(ArrayList<Workout> workouts) {
+		lectura.guardarWorkouts(workouts);
+	}
+
 }

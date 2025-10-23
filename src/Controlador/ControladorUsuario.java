@@ -19,6 +19,8 @@ import Modelo.Usuario;
 import Modelo.Workout;
 import Modelo.Backup;
 
+import LecturaPB.lectura; // import simple para generar backups
+
 public class ControladorUsuario implements ActionListener {
 
     private Vista.login vistaLogin;
@@ -230,10 +232,12 @@ public class ControladorUsuario implements ActionListener {
 
            
             try {
-               
-                Backup.guardarWorkouts(Workout.mObtenerWorkouts());
+                // Generar ambos backups (usuarios y workouts) de forma sencilla
+                System.out.println("Inicio: generarBackupsDesdeServidor()");
+                lectura.generarBackupsDesdeServidor();
+                System.out.println("Fin: generarBackupsDesdeServidor()");
             } catch (Exception ex) {
-                System.err.println("Error guardando backups de workouts: " + ex.getMessage());
+                System.err.println("Error generando backups: " + ex.getMessage());
                 ex.printStackTrace();
             }
 
