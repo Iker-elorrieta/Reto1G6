@@ -9,16 +9,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import Modelo.Ejercicio;
-import Modelo.Serie;
 import Modelo.Usuario;
 import Modelo.Workout;
+import Modelo.Backup;
 
 public class ControladorUsuario implements ActionListener {
 
@@ -95,6 +94,18 @@ public class ControladorUsuario implements ActionListener {
         this.vistaPerfil.getBtnCambiarDatos().addActionListener(this);
         this.vistaPerfil.getBtnCambiarDatos().setActionCommand("CAMBIAR_DATOS");
     }
+    
+    //Para comprobar la conexión al servidor, SPRINT2
+    private boolean comprobarConexion() {
+    	boolean conexionOK = false;
+		try {
+			Usuario u = new Usuario();
+			u.mObtenerUsuarios();
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Error de conexión con el servidor. Algunas funciones pueden no estar disponibles.", "Error de Conexión", JOptionPane.ERROR_MESSAGE);
+		}
+		return conexionOK;
+	}
 
     // Inicializador para la vista workouts
     private void inicializarControladorWorkouts() {
@@ -102,14 +113,14 @@ public class ControladorUsuario implements ActionListener {
         this.vistaWorkouts.getBtnVolver().addActionListener(this);
         this.vistaWorkouts.getBtnVolver().setActionCommand("VOLVER_WORKOUTS");
 
-        // Poblar tabla de workouts
+       
         try {
             ArrayList<Workout> lista = Workout.mObtenerWorkouts();
             DefaultTableModel model = (DefaultTableModel) this.vistaWorkouts.getTableWorkouts().getModel();
-            // limpiar
+         
             model.setRowCount(0);
             for (Workout w : lista) {
-                // agregar solo workouts que el usuario pueda ver (propietario o nivel suficiente)
+                // agregar solo workouts que el usuario pueda ver
                 boolean permitido = false;
                 if (this.usuarioActual != null) {
                     if (w.getOwner() != null && !w.getOwner().isEmpty() && this.usuarioActual.getEmail() != null && w.getOwner().equalsIgnoreCase(this.usuarioActual.getEmail())) {
@@ -138,7 +149,7 @@ public class ControladorUsuario implements ActionListener {
                  if (e.getClickCount() == 2) {
                      int row = vistaWorkouts.getTableWorkouts().getSelectedRow();
                      if (row >= 0) {
-                         // Como filtramos la lista al poblarla, cualquier fila seleccionada es accesible
+                        
                          String workoutId = String.valueOf(vistaWorkouts.getTableWorkouts().getValueAt(row, 0));
                          mAbrirEjercicios(workoutId);
                      }
@@ -147,7 +158,7 @@ public class ControladorUsuario implements ActionListener {
          });
     }
 
-    // Nuevo constructor para manejar workouts con usuario
+    // Nuevo constructor 
     public ControladorUsuario(Vista.workouts vistaWorkouts, Vista.menu vistaMenu, Usuario usuario) {
         this.vistaWorkouts = vistaWorkouts;
         this.vistaMenu = vistaMenu;
@@ -155,7 +166,7 @@ public class ControladorUsuario implements ActionListener {
         this.inicializarControladorWorkouts();
     }
 
-    // Sobrecarga: permitir crear controlador de workouts sin usuario (compatibilidad)
+
     public ControladorUsuario(Vista.workouts vistaWorkouts, Vista.menu vistaMenu) {
         this(vistaWorkouts, vistaMenu, null);
     }
@@ -216,6 +227,15 @@ public class ControladorUsuario implements ActionListener {
             this.vistaLogin.dispose();
 
             new ControladorUsuario(ventanaMenu, usuario);
+
+           
+            try {
+               
+                Backup.guardarWorkouts(Workout.mObtenerWorkouts());
+            } catch (Exception ex) {
+                System.err.println("Error guardando backups de workouts: " + ex.getMessage());
+                ex.printStackTrace();
+            }
 
             this.vistaLogin.limpiarCampos();
 
@@ -378,7 +398,7 @@ public class ControladorUsuario implements ActionListener {
         this.vistaMenu.setVisible(false);
 
         ventanaWorkouts.setVisible(true);
-        // pasar el usuario para control de permisos
+      
         new ControladorUsuario(ventanaWorkouts, this.vistaMenu, this.usuarioActual);
     }
 

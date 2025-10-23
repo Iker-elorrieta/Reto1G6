@@ -9,7 +9,8 @@ import com.google.cloud.firestore.QuerySnapshot;
 
 import conexion.Conexion;
 
-public class Workout {
+public class Workout implements java.io.Serializable {
+    private static final long serialVersionUID = 1L;
 	private static String collectionName = "workouts";
     private String Nombre; //sera usado como id
     private String Descripcion;
@@ -102,7 +103,7 @@ public class Workout {
                         durTotal += e.getDuracionMinutos();
                     }
                 } catch (Exception ex) {
-                    // ignore
+                 
                 }
                 w.setDuracionMinutos(durTotal);
 
@@ -117,42 +118,49 @@ public class Workout {
     }
     
     public ArrayList<Workout> obtenerWorkouts(Long nivelUsuario) {
-		Firestore co = null;
-		ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
+        ArrayList<Workout> lista = new ArrayList<>();
+        Firestore co = null;
+        try {
+            co = Conexion.conectar();
+            ApiFuture<QuerySnapshot> query;
+            if (nivelUsuario != null) {
+                // filtrar por nivel si se pasa un valor
+                query = co.collection(collectionName).whereLessThanOrEqualTo("Nivel", nivelUsuario).get();
+            } else {
+                query = co.collection(collectionName).get();
+            }
 
-		try {
-			co = Conexion.conectar();
-			ApiFuture<QuerySnapshot> query = co.collection(collectionName)
-					.whereLessThanOrEqualTo(fieldNivel, nivelUsuario).get();
-			QuerySnapshot querySnaºpshot = query.get();
-			List<QueryDocumentSnapshot> workouts = querySnapshot.getDocuments();
+            QuerySnapshot querySnapshot = query.get();
+            for (QueryDocumentSnapshot doc : querySnapshot.getDocuments()) {
+                Workout w = new Workout();
+                w.setNombre(doc.getId());
+                w.setDescripcion(doc.getString("Descripcion"));
+                w.setVideo(doc.getString("Video"));
+                Long nivelL = doc.getLong("Nivel");
+                if (nivelL != null) w.setNivel(nivelL.intValue());
+                String ownerStr = doc.getString("owner");
+                if (ownerStr == null) ownerStr = doc.getString("Usuario");
+                w.setOwner(ownerStr);
 
-			for (QueryDocumentSnapshot workout : workouts) {
-				Workout w = new Workout();
-				w.setId(workout.getId());
-				w.setNombre(workout.getString(fieldNombre));
+                // Calcular duración sumando ejercicios relacionados a este workout
+                double durTotal = 0.0;
+                try {
+                    ArrayList<Ejercicio> ejercs = Ejercicio.mObtenerEjercicios(doc.getId());
+                    for (Ejercicio e : ejercs) {
+                        durTotal += e.getDuracionMinutos();
+                    }
+                } catch (Exception ex) {
+                    // ignorar errores al obtener ejercicios y dejar duración en 0
+                }
+                w.setDuracionMinutos(durTotal);
 
-				// Cambiar de getString a getLong para los campos numéricos
-				Long nivel = workout.getLong(fieldNivel);
-				Long numEjers = workout.getLong(fieldNumEjers);
+                lista.add(w);
+            }
+            co.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-				// Evitar el error de casting si el valor es null
-				if (nivel != null)
-					w.setNivel(nivel.intValue()); // Convertir de Long a int
-
-				if (numEjers != null)
-					w.setNumEjers(numEjers.intValue()); // Convertir de Long a int
-
-				w.setVideoUrl(workout.getString(fieldVideoUrl));
-				w.setDescripcion(workout.getString(fieldDescripcion));
-				listaWorkouts.add(w);
-
-			}
-			co.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return listaWorkouts;
-	}
+        return lista;
+    }
 }

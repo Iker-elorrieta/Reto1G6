@@ -94,10 +94,10 @@ public class workouts extends JFrame {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				return false; // make all cells non-editable
+				return false; 
 			}
 		});
-		// Ensure single selection so double-click targets a single workout
+		
 		tableWorkouts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tableWorkouts.getColumnModel().getColumn(0).setPreferredWidth(288);
 		tableWorkouts.getColumnModel().getColumn(1).setPreferredWidth(46);
