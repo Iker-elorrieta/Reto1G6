@@ -6,20 +6,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import LecturaPB.lectura; // import simple para generar backups
 import Modelo.Ejercicio;
 import Modelo.Usuario;
 import Modelo.Workout;
-import Modelo.Backup;
-
-import LecturaPB.lectura; // import simple para generar backups
 
 public class ControladorUsuario implements ActionListener {
 
@@ -92,22 +90,22 @@ public class ControladorUsuario implements ActionListener {
         this.vistaPerfil.getBtnVolver().addActionListener(this);
         this.vistaPerfil.getBtnVolver().setActionCommand("VOLVER_MENU");
 
-
         this.vistaPerfil.getBtnCambiarDatos().addActionListener(this);
         this.vistaPerfil.getBtnCambiarDatos().setActionCommand("CAMBIAR_DATOS");
     }
     
     //Para comprobar la conexión al servidor, SPRINT2
     private boolean comprobarConexion() {
-    	boolean conexionOK = false;
-		try {
-			Usuario u = new Usuario();
-			u.mObtenerUsuarios();
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Error de conexión con el servidor. Algunas funciones pueden no estar disponibles.", "Error de Conexión", JOptionPane.ERROR_MESSAGE);
-		}
-		return conexionOK;
-	}
+        boolean conexionOK = false;
+        try {
+            Usuario u = new Usuario();
+            u.mObtenerUsuarios();
+            conexionOK = true;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error de conexión con el servidor.", null, JOptionPane.ERROR_MESSAGE);
+        }
+        return conexionOK;
+    }
 
     // Inicializador para la vista workouts
     private void inicializarControladorWorkouts() {
@@ -115,7 +113,6 @@ public class ControladorUsuario implements ActionListener {
         this.vistaWorkouts.getBtnVolver().addActionListener(this);
         this.vistaWorkouts.getBtnVolver().setActionCommand("VOLVER_WORKOUTS");
 
-       
         try {
             ArrayList<Workout> lista = Workout.mObtenerWorkouts();
             DefaultTableModel model = (DefaultTableModel) this.vistaWorkouts.getTableWorkouts().getModel();
@@ -125,7 +122,8 @@ public class ControladorUsuario implements ActionListener {
                 // agregar solo workouts que el usuario pueda ver
                 boolean permitido = false;
                 if (this.usuarioActual != null) {
-                    if (w.getOwner() != null && !w.getOwner().isEmpty() && this.usuarioActual.getEmail() != null && w.getOwner().equalsIgnoreCase(this.usuarioActual.getEmail())) {
+                    if (w.getOwner() != null && !w.getOwner().isEmpty() && this.usuarioActual.getEmail() != null
+                        && w.getOwner().equalsIgnoreCase(this.usuarioActual.getEmail())) {
                         permitido = true;
                     } else if (this.usuarioActual.getNivel() >= w.getNivel()) {
                         permitido = true;
@@ -137,7 +135,7 @@ public class ControladorUsuario implements ActionListener {
                 }
              }
              if (model.getRowCount() == 0) {
-                 javax.swing.JOptionPane.showMessageDialog(null, "No hay workouts disponibles para tu nivel", "Información", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                 javax.swing.JOptionPane.showMessageDialog(null, "No hay workouts disponibles para tu nivel", null, javax.swing.JOptionPane.INFORMATION_MESSAGE);
              }
          } catch (Exception e) {
              System.out.println("Error al cargar workouts en la vista");
@@ -151,7 +149,6 @@ public class ControladorUsuario implements ActionListener {
                  if (e.getClickCount() == 2) {
                      int row = vistaWorkouts.getTableWorkouts().getSelectedRow();
                      if (row >= 0) {
-                        
                          String workoutId = String.valueOf(vistaWorkouts.getTableWorkouts().getValueAt(row, 0));
                          mAbrirEjercicios(workoutId);
                      }
@@ -167,7 +164,6 @@ public class ControladorUsuario implements ActionListener {
         this.usuarioActual = usuario;
         this.inicializarControladorWorkouts();
     }
-
 
     public ControladorUsuario(Vista.workouts vistaWorkouts, Vista.menu vistaMenu) {
         this(vistaWorkouts, vistaMenu, null);
@@ -209,30 +205,31 @@ public class ControladorUsuario implements ActionListener {
             return;
         }
 
-        String emailId = email.trim().toLowerCase();
+        String emailId = email.toLowerCase();
         Usuario usuario = new Usuario();
         if (usuario.mAutenticarUsuario(emailId, pass)) {
 
             usuario = usuario.mObtenerUsuario(emailId);
 
-
+            // Sección revisada
             Vista.menu ventanaMenu = new Vista.menu();
-            String nombreParaMostrar = (usuario.getNombre() != null && !usuario.getNombre().isEmpty()) ? usuario.getNombre() : usuario.getEmail();
+            String nombreParaMostrar;
+            if (usuario.getNombre() != null && !usuario.getNombre().isEmpty()) {
+                nombreParaMostrar = usuario.getNombre();
+            } else {
+                nombreParaMostrar = usuario.getEmail();
+            }
             ventanaMenu.setBienvenido(nombreParaMostrar);
             ventanaMenu.setNivelText(String.valueOf(usuario.getNivel()));
 
-
             ventanaMenu.setVisible(true);
-
 
             this.vistaLogin.setVisible(false);
             this.vistaLogin.dispose();
 
             new ControladorUsuario(ventanaMenu, usuario);
 
-           
             try {
-                // Generar ambos backups (usuarios y workouts) de forma sencilla
                 System.out.println("Inicio: generarBackupsDesdeServidor()");
                 lectura.generarBackupsDesdeServidor();
                 System.out.println("Fin: generarBackupsDesdeServidor()");
@@ -242,20 +239,18 @@ public class ControladorUsuario implements ActionListener {
             }
 
             this.vistaLogin.limpiarCampos();
-
             this.vistaLogin.getLblErrores().setText("Login exitoso - Bienvenido al GymApp");
         } else {
             this.vistaLogin.getLblErrores().setText("Credenciales incorrectas");
         }
     }
 
-
     private void mAbrirPerfil() {
-
-        if (this.usuarioActual == null || this.vistaMenu == null) return;
+        if (this.usuarioActual == null || this.vistaMenu == null) {
+            return;
+        }
 
         this.vistaMenu.setVisible(false);
-
         Vista.perfil ventanaPerfil = new Vista.perfil();
 
         new ControladorUsuario(ventanaPerfil, this.vistaMenu, this.usuarioActual);
@@ -271,7 +266,6 @@ public class ControladorUsuario implements ActionListener {
         ventanaLogin.setVisible(true);
         new ControladorUsuario(ventanaLogin);
     }
-
 
     private void mVolverAMenu() {
         if (this.vistaPerfil != null) {
@@ -303,7 +297,6 @@ public class ControladorUsuario implements ActionListener {
             this.vistaRegistro.getLblErrores().setText("Todos los campos son obligatorios");
             return;
         }
-
 
         String emailRegex = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
         if (!email.matches(emailRegex)) {
@@ -348,7 +341,9 @@ public class ControladorUsuario implements ActionListener {
     }
 
     private void mCambiarDatos() {
-        if (this.vistaPerfil == null || this.usuarioActual == null) return;
+        if (this.vistaPerfil == null || this.usuarioActual == null) {
+            return;
+        }
 
         String nombre = this.vistaPerfil.getTxtNombre().getText().trim();
         String apellidos = this.vistaPerfil.getTxtApellidos().getText().trim();
@@ -359,7 +354,6 @@ public class ControladorUsuario implements ActionListener {
             this.vistaPerfil.getLblErrores().setText("Nombre y apellidos son obligatorios");
             return;
         }
-
 
         java.util.Date fechaNacimiento = null;
         if (!fechaNacStr.isEmpty()) {
@@ -373,7 +367,6 @@ public class ControladorUsuario implements ActionListener {
             }
         }
 
-
         this.usuarioActual.setNombre(nombre);
         this.usuarioActual.setApellidos(apellidos);
         if (!pass.isEmpty()) {
@@ -383,9 +376,17 @@ public class ControladorUsuario implements ActionListener {
 
         boolean ok = this.usuarioActual.mActualizarUsuario();
         if (ok) {
+            // Sección revisada, reemplazando ternario y haciendo natural
             this.vistaPerfil.getLblErrores().setText("Datos actualizados correctamente");
+
             if (this.vistaMenu != null) {
-                String nombreParaMostrar = (this.usuarioActual.getNombre() != null && !this.usuarioActual.getNombre().isEmpty()) ? this.usuarioActual.getNombre() : this.usuarioActual.getEmail();
+                String nombreParaMostrar;
+                if (this.usuarioActual.getNombre() != null && !this.usuarioActual.getNombre().isEmpty()) {
+                    nombreParaMostrar = this.usuarioActual.getNombre();
+                } else {
+                    nombreParaMostrar = this.usuarioActual.getEmail();
+                }
+
                 this.vistaMenu.setBienvenido(nombreParaMostrar);
                 this.vistaMenu.setNivelText(String.valueOf(this.usuarioActual.getNivel()));
             }
@@ -395,14 +396,9 @@ public class ControladorUsuario implements ActionListener {
     }
 
     private void mAbrirWorkouts() {
-
-
         Vista.workouts ventanaWorkouts = new Vista.workouts();
-
         this.vistaMenu.setVisible(false);
-
         ventanaWorkouts.setVisible(true);
-      
         new ControladorUsuario(ventanaWorkouts, this.vistaMenu, this.usuarioActual);
     }
 
@@ -415,114 +411,120 @@ public class ControladorUsuario implements ActionListener {
             this.vistaMenu.setVisible(true);
         }
     }
-    // REVISAR EL CONTENIDO GENERADO POR LA IA,ASEGURARSE QUE SE CAMBIA/COMPRENDE LOS EXCEPTION RAROS 
-    // Abrir la vista de ejercicios para un workout concreto
+   
+
+    // Sección revisada: mAbrirEjercicios
     private void mAbrirEjercicios(String workoutId) {
         try {
             vistaEjercicios = new Vista.ejercicios();
 
-            // Poblar tabla de ejercicios
             DefaultTableModel model = (DefaultTableModel) vistaEjercicios.getTableEjercicios().getModel();
             model.setRowCount(0);
+
             ArrayList<Ejercicio> lista = Ejercicio.mObtenerEjercicios(workoutId);
             for (Ejercicio e : lista) {
-                Object[] row = new Object[] { e.getNombre(), String.format("%.1f", e.getDuracionMinutos()), e.getSeriesCount(), String.format("%.1f", e.getAvgTiempoDescanso()), String.format("%.1f", e.getAvgTiempoSerie()) };
+                Object[] row = new Object[] {
+                    e.getNombre(),
+                    String.format("%.1f", e.getDuracionMinutos()),
+                    e.getSeriesCount(),
+                    String.format("%.1f", e.getAvgTiempoDescanso()),
+                    String.format("%.1f", e.getAvgTiempoSerie())
+                };
                 model.addRow(row);
             }
 
-            // listener de selección para actualizar descripcion e imagen
             vistaEjercicios.getTableEjercicios().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
                     int row = vistaEjercicios.getTableEjercicios().getSelectedRow();
-                    if (row >= 0) {
-                        String ejercicioId = String.valueOf(vistaEjercicios.getTableEjercicios().getValueAt(row, 0));
-                        // buscar ejercicio en lista
-                        Ejercicio seleccionado = null;
-                        for (Ejercicio ex : lista) if (ex.getNombre().equals(ejercicioId)) { seleccionado = ex; break; }
-                        if (seleccionado != null) {
-                            vistaEjercicios.getLblDescripcion().setText("Descripción: " + (seleccionado.getDescripcion() != null ? seleccionado.getDescripcion() : ""));
-                            String img = seleccionado.getImagen();
-                            if (img != null && !img.isEmpty()) {
+                    if (row < 0) return;
+
+                    String ejercicioId = String.valueOf(vistaEjercicios.getTableEjercicios().getValueAt(row, 0));
+                    Ejercicio seleccionado = null;
+                    for (Ejercicio ex : lista) {
+                        if (seleccionado == null && ex.getNombre().equals(ejercicioId)) {
+                            seleccionado = ex;
+                        }
+                    
+                    }
+
+                    if (seleccionado != null) {
+                        String descripcion = seleccionado.getDescripcion();
+                        if (descripcion == null) descripcion = "";
+                        vistaEjercicios.getLblDescripcion().setText("Descripción: " + descripcion);
+
+                        String img = seleccionado.getImagen();
+                        javax.swing.JLabel lbl = vistaEjercicios.getLblImg();
+                        if (img != null && !img.isEmpty()) {
+                            java.awt.Image orig = null;
+
+                            try {
+                                java.io.File f = new java.io.File(img);
+                                if (f.exists()) orig = new javax.swing.ImageIcon(f.getAbsolutePath()).getImage();
+                            } catch (Exception ex) {
+                               
+                            }
+
+                            if (orig == null) {
                                 try {
-                                    javax.swing.JLabel lbl = vistaEjercicios.getLblImg();
-                                    java.awt.Image orig = null;
-                                    // Intentar cargar desde fichero absoluto/relativo
-                                    try {
-                                        java.io.File f = new java.io.File(img);
-                                        if (f.exists()) {
-                                            orig = new javax.swing.ImageIcon(f.getAbsolutePath()).getImage();
-                                        }
-                                    } catch (Exception __fex) {
-                                        // ignore
-                                    }
-                                    // Si no se cargó desde fichero, intentar desde resources (classpath)
-                                    if (orig == null) {
-                                        try {
-                                            java.net.URL res = ControladorUsuario.class.getResource("/" + img);
-                                            if (res != null) {
-                                                orig = new javax.swing.ImageIcon(res).getImage();
-                                            }
-                                        } catch (Exception __re) {
-                                            // ignore
-                                        }
-                                    }
-                                    // Último recurso: dejar que ImageIcon intente interpretar como URL/path
-                                    if (orig == null) {
-                                        try {
-                                            javax.swing.ImageIcon tmp = new javax.swing.ImageIcon(img);
-                                            orig = tmp.getImage();
-                                        } catch (Exception __ux) {
-                                            orig = null;
-                                        }
-                                    }
-                                    int lw = lbl.getWidth();
-                                    int lh = lbl.getHeight();
-                                    if (lw <= 0) lw = 335; // fallback to design size
-                                    if (lh <= 0) lh = 220;
-                                    if (orig != null) {
-                                        int ow = orig.getWidth(null);
-                                        int oh = orig.getHeight(null);
-                                        if (ow <= 0 || oh <= 0) {
-                                            // cannot determine original size, try direct set
-                                            lbl.setIcon(new javax.swing.ImageIcon(orig));
-                                            lbl.setText("");
-                                        } else {
-                                            double scale = Math.min((double)lw / ow, (double)lh / oh);
-                                            int nw = (int)Math.max(1, Math.round(ow * scale));
-                                            int nh = (int)Math.max(1, Math.round(oh * scale));
-                                            java.awt.Image scaled = orig.getScaledInstance(nw, nh, java.awt.Image.SCALE_SMOOTH);
-                                            lbl.setIcon(new javax.swing.ImageIcon(scaled));
-                                            lbl.setText("");
-                                        }
-                                    } else {
-                                        lbl.setIcon(null);
-                                        lbl.setText("Imagen no disponible");
-                                    }
-                                } catch (Exception exx) {
-                                    vistaEjercicios.getLblImg().setText("Imagen no disponible");
-                                    vistaEjercicios.getLblImg().setIcon(null);
+                                    java.net.URL res = ControladorUsuario.class.getResource("/" + img);
+                                    if (res != null) orig = new javax.swing.ImageIcon(res).getImage();
+                                } catch (Exception ex) {
+                                   
+                                }
+                            }
+
+                            if (orig == null) {
+                                try {
+                                    orig = new javax.swing.ImageIcon(img).getImage();
+                                } catch (Exception ex) {
+                                    orig = null;
+                                }
+                            }
+
+                            int lw = lbl.getWidth();
+                            int lh = lbl.getHeight();
+                            if (lw <= 0) lw = 335;
+                            if (lh <= 0) lh = 220;
+
+                            if (orig != null) {
+                                int ow = orig.getWidth(null);
+                                int oh = orig.getHeight(null);
+                                if (ow > 0 && oh > 0) {
+                                    double scale = Math.min((double) lw / ow, (double) lh / oh);
+                                    int nw = (int) Math.max(1, Math.round(ow * scale));
+                                    int nh = (int) Math.max(1, Math.round(oh * scale));
+                                    java.awt.Image scaled = orig.getScaledInstance(nw, nh, java.awt.Image.SCALE_SMOOTH);
+                                    lbl.setIcon(new javax.swing.ImageIcon(scaled));
+                                    lbl.setText("");
+                                } else {
+                                    lbl.setIcon(new javax.swing.ImageIcon(orig));
+                                    lbl.setText("");
                                 }
                             } else {
-                                vistaEjercicios.getLblImg().setText("Imagen no disponible");
-                                vistaEjercicios.getLblImg().setIcon(null);
+                                lbl.setIcon(null);
+                                lbl.setText("Imagen no disponible");
                             }
+                        } else {
+                            lbl.setIcon(null);
+                            lbl.setText("Imagen no disponible");
                         }
                     }
                 }
             });
 
-            // boton volver en ejercicios vuelve a workouts
+            // Botón volver en ejercicios
             vistaEjercicios.getBtnVolver().addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     vistaEjercicios.setVisible(false);
                     vistaEjercicios.dispose();
-                    if (vistaWorkouts != null) vistaWorkouts.setVisible(true);
+                    if (vistaWorkouts != null) {
+                        vistaWorkouts.setVisible(true);
+                    }
                 }
             });
 
-            // mostrar vista
             if (vistaWorkouts != null) {
                 vistaWorkouts.setVisible(false);
             }

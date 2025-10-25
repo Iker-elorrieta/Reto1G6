@@ -247,7 +247,8 @@ public class Usuario implements Serializable {
 		try {
 			co = Conexion.conectar();
 			String emailId = (email != null) ? email.trim().toLowerCase() : null;
-			if (emailId == null || emailId.isEmpty()) return false;
+			if (emailId == null || emailId.isEmpty()) {
+				return false;}
 			// Obtener documento por id = emailId
 			DocumentSnapshot doc = co.collection(collectionName).document(emailId).get().get();
 			if (doc != null && doc.exists()) {

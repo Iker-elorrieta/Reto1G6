@@ -12,7 +12,11 @@ import conexion.Conexion;
 
 public class Serie extends Ejercicio {
     
-    private String Nombre; //sera usado como id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String Nombre; //sera usado como id
     private int Cantidad;
     private int Tiempo_serie;
     private int Tiempo_descanso;
@@ -96,7 +100,7 @@ public class Serie extends Ejercicio {
             }
             co.close();
         } catch (Exception e) {
-            System.out.println("Error: Clase Serie - mObtenerSeries");
+            System.out.println("Error mObtenerSeries");
             e.printStackTrace();
         }
         return lista;

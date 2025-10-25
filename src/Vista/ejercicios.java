@@ -91,7 +91,7 @@ public class ejercicios extends JFrame {
 				{null, null, null, null, null},
 			},
 			new String[] {
-				"Nombre", "Duraci\u00F3n", "Series", "T. Descanso", "T. Serie"
+				"Nombre", "Duracion", "Series", "T. Descanso", "T. Serie"
 			}
 		));
 		table.getColumnModel().getColumn(0).setPreferredWidth(220);

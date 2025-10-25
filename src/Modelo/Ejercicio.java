@@ -11,7 +11,11 @@ import conexion.Conexion;
 
 public class Ejercicio extends Workout {
     
-    private String Nombre; //sera usado como id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String Nombre; //sera usado como id
     private String Descripcion;
     private String Imagen;
 

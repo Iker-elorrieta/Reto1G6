@@ -161,7 +161,8 @@ public class perfil extends JFrame {
 
   
      private String formatearFecha(java.util.Date d) {
-         if (d == null) return "";
+         if (d == null) {
+        	 return "";}
          SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
          return df.format(d);
      }
