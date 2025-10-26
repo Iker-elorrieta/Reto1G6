@@ -19,9 +19,8 @@ import com.google.cloud.firestore.QuerySnapshot;
 import conexion.Conexion;
 
 public class Usuario implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-	
 	private String idUsuario;
 	private String nombre;
 	private String apellidos;
@@ -39,7 +38,6 @@ public class Usuario implements Serializable {
 	private static String fieldNivel = "nivel";
 	private static String fieldTipoUsuario = "tipoUsuario";
 
-	
 	public Usuario() {
 	}
 
@@ -53,7 +51,6 @@ public class Usuario implements Serializable {
 		this.tipoUsuario = "CLIENTE";
 	}
 
-	
 	public String getIdUsuario() {
 		return idUsuario;
 	}
@@ -118,7 +115,6 @@ public class Usuario implements Serializable {
 		this.tipoUsuario = tipoUsuario;
 	}
 
-	
 	public Usuario mObtenerUsuario(String idUsuario) {
 		Firestore co = null;
 
@@ -139,7 +135,7 @@ public class Usuario implements Serializable {
 					setNivel(0);
 				}
 				setTipoUsuario(usuario.getString(fieldTipoUsuario));
-				
+
 				String fechaStr = usuario.getString(fieldFechaNacimiento);
 				if (fechaStr != null) {
 					SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
@@ -166,7 +162,7 @@ public class Usuario implements Serializable {
 			ApiFuture<QuerySnapshot> query = co.collection(collectionName).get();
 			QuerySnapshot querySnapshot = query.get();
 			List<QueryDocumentSnapshot> usuarios = querySnapshot.getDocuments();
-			
+
 			for (QueryDocumentSnapshot usuario : usuarios) {
 				Usuario u = new Usuario();
 				u.setIdUsuario(usuario.getId());
@@ -174,20 +170,37 @@ public class Usuario implements Serializable {
 				u.setApellidos(usuario.getString(fieldApellidos));
 				u.setEmail(usuario.getId());
 				u.setPass(usuario.getString(fieldPass));
-				Double nivelObj = usuario.getDouble(fieldNivel);
-				if (nivelObj != null) {
-					u.setNivel(nivelObj);
+				Double nivelObj = null;
+				Object valor = usuario.get(fieldNivel);
+
+				if (valor == null) {
+				    nivelObj = 0.0; 
+				}	else if (valor instanceof Number) {
+					nivelObj = ((Number) valor).doubleValue();
 				} else {
-					u.setNivel(0);
+					nivelObj = Double.parseDouble((String) valor);
 				}
-				u.setTipoUsuario(usuario.getString(fieldTipoUsuario));
-				
+
+				u.setNivel(nivelObj);
+
+				Object valorTipo = usuario.get(fieldTipoUsuario);
+				String tipoUsuario= null;
+
+				if (valorTipo == null) {
+				    tipoUsuario = null; 
+				} else if (valorTipo instanceof String) {
+				    tipoUsuario = ((String) valorTipo).trim();
+				} else if (valorTipo instanceof Boolean) {
+				    tipoUsuario = (Boolean) valorTipo ? "true" : "false";
+				}
+
+				u.setTipoUsuario(tipoUsuario);
 				String fechaStr = usuario.getString(fieldFechaNacimiento);
 				if (fechaStr != null) {
 					SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 					u.setFechaNacimiento(df.parse(fechaStr));
 				}
-				
+
 				listaUsuarios.add(u);
 			}
 			co.close();
@@ -233,7 +246,7 @@ public class Usuario implements Serializable {
 			this.email = emailId;
 			co.close();
 			return true;
-			
+
 		} catch (Exception e) {
 			System.out.println("Error: Clase Usuario");
 			e.printStackTrace();
@@ -248,7 +261,8 @@ public class Usuario implements Serializable {
 			co = Conexion.conectar();
 			String emailId = (email != null) ? email.trim().toLowerCase() : null;
 			if (emailId == null || emailId.isEmpty()) {
-				return false;}
+				return false;
+			}
 			// Obtener documento por id = emailId
 			DocumentSnapshot doc = co.collection(collectionName).document(emailId).get().get();
 			if (doc != null && doc.exists()) {
@@ -259,7 +273,7 @@ public class Usuario implements Serializable {
 				}
 			}
 			co.close();
-			
+
 		} catch (Exception e) {
 			System.out.println("Error: Clase Usuario");
 			e.printStackTrace();
@@ -302,7 +316,5 @@ public class Usuario implements Serializable {
 		}
 		return false;
 	}
-	
-	
 
 }

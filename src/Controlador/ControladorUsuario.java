@@ -16,6 +16,7 @@ import javax.swing.table.DefaultTableModel;
 
 import LecturaPB.lectura; // import simple para generar backups
 import Modelo.Ejercicio;
+import Modelo.HiloBackup;
 import Modelo.Usuario;
 import Modelo.Workout;
 
@@ -230,9 +231,8 @@ public class ControladorUsuario implements ActionListener {
             new ControladorUsuario(ventanaMenu, usuario);
 
             try {
-                System.out.println("Inicio: generarBackupsDesdeServidor()");
-                lectura.generarBackupsDesdeServidor();
-                System.out.println("Fin: generarBackupsDesdeServidor()");
+                HiloBackup hb = new HiloBackup();
+                hb.start();
             } catch (Exception ex) {
                 System.err.println("Error generando backups: " + ex.getMessage());
                 ex.printStackTrace();

@@ -14,7 +14,7 @@ public class lectura {
 	private static final String FILE_USERS = "backups/usuario.dat";
 	private static final String FILE_WORKOUTS = "backups/workouts.dat";
 
-	public static void guardarUsuarios(ArrayList<Usuario> usuarios) {
+	private static void guardarUsuarios(ArrayList<Usuario> usuarios) {
 		try {
 			File dir = new File("backups");
 			if (!dir.exists()) dir.mkdirs();
@@ -34,7 +34,7 @@ public class lectura {
 		}
 	}
 
-	public static void guardarWorkouts(ArrayList<Workout> workouts) {
+	private static void guardarWorkouts(ArrayList<Workout> workouts) {
 		try {
 			File dir = new File("backups");
 			if (!dir.exists()) dir.mkdirs();
@@ -55,7 +55,7 @@ public class lectura {
 	}
 
 	
-	public static void generarBackupsDesdeServidor() {
+	private static void generarBackupsDesdeServidor() {
 		ArrayList<Usuario> usuarios = null;
 		ArrayList<Workout> workouts = null;
 		int maxLevel = 3;

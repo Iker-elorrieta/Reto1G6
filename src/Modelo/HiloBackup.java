@@ -16,7 +16,8 @@ public class HiloBackup extends Thread {
 		// Para llamar la clase lectura y guardar los datos en los archivos .dat
 		try {
 			// Ejecutamos la clase LecturaPB.lectura desde el directorio bin
-			ProcessBuilder pb = new ProcessBuilder("java", "-jar", ".", "backups.jar");
+			ProcessBuilder pb = new ProcessBuilder("java", "-jar", "backups.jar");
+
 			// Redirigimos la salida para ver mensajes en la consola del padre (opcional y sencillo)
 			pb.inheritIO();
 			Process proces = pb.start();
