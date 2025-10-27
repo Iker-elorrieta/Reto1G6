@@ -9,18 +9,19 @@ public class Backup {
     public static void main(String[] args) {
 
         int maxLevel = 3;
+        Backup b = new Backup();
         for (String a : args) {
             String arg = a.toLowerCase();
 
             if (arg.equals("usuarios")) {
-                guardarUsuarios(new Usuario().mObtenerUsuarios());
+                b.guardarUsuarios(new Usuario().mObtenerUsuarios());
 
             } else if (arg.equals("workouts")) {
-                guardarWorkouts(new Workout().obtenerWorkouts((long) maxLevel));
+                b.guardarWorkouts(new Workout().obtenerWorkouts((long) maxLevel));
 
             } else if (arg.equals("both")) {
-                guardarUsuarios(new Usuario().mObtenerUsuarios());
-                guardarWorkouts(new Workout().obtenerWorkouts((long) maxLevel));
+                b.guardarUsuarios(new Usuario().mObtenerUsuarios());
+                b.guardarWorkouts(new Workout().obtenerWorkouts((long) maxLevel));
 
             } else {
                 System.out.println("Argumento no válido: " + a);
@@ -31,11 +32,11 @@ public class Backup {
         hb.start();
     }
 
-    public static void guardarUsuarios(ArrayList<Usuario> usuarios) {
+    public void guardarUsuarios(ArrayList<Usuario> usuarios) {
         lectura.guardarUsuarios(usuarios);
     }
 
-    public static void guardarWorkouts(ArrayList<Workout> workouts) {
+    public void guardarWorkouts(ArrayList<Workout> workouts) {
         lectura.guardarWorkouts(workouts);
     }
 }

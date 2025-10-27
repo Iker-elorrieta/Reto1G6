@@ -3,7 +3,6 @@ package Modelo;
 import java.util.ArrayList;
 
 import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -65,7 +64,12 @@ public class Serie extends Ejercicio {
 
     // Calcula la duración total de esta serie en minutos
     public double getDuracionMinutos() {
-        int cantidad = (Cantidad > 0) ? Cantidad : 0;
+        int cantidad;
+        if (Cantidad > 0) {
+            cantidad = Cantidad;
+        } else {
+            cantidad = 0;
+        }
         if (cantidad == 0) return 0.0;
         int totalSegundos = cantidad * Tiempo_serie;
         if (cantidad > 1) {
@@ -75,34 +79,34 @@ public class Serie extends Ejercicio {
     }
 
     // Obtiene todas las Series para un ejercicio específico dentro de un workout
-    public static ArrayList<Serie> mObtenerSeries(String workoutId, String ejercicioId) {
-        ArrayList<Serie> lista = new ArrayList<>();
-        Firestore co = null;
-        try {
-            co = Conexion.conectar();
-            ApiFuture<QuerySnapshot> query = co.collection("workouts")
-                    .document(workoutId)
-                    .collection("ejercicios")
-                    .document(ejercicioId)
-                    .collection("Series")
-                    .get();
-            QuerySnapshot querySnapshot = query.get();
-            for (QueryDocumentSnapshot doc : querySnapshot.getDocuments()) {
-                Serie s = new Serie();
-                s.setNombre(doc.getId());
-                Long cantidadL = doc.getLong("Cantidad");
-                Long tiempoSerieL = doc.getLong("Tiempo_serie");
-                Long tiempoDescL = doc.getLong("Tiempo_descanso");
-                if (cantidadL != null) s.setCantidad(cantidadL.intValue());
-                if (tiempoSerieL != null) s.setTiempo_serie(tiempoSerieL.intValue());
-                if (tiempoDescL != null) s.setTiempo_descanso(tiempoDescL.intValue());
-                lista.add(s);
-            }
-            co.close();
-        } catch (Exception e) {
-            System.out.println("Error mObtenerSeries");
-            e.printStackTrace();
-        }
-        return lista;
-    }
+    public ArrayList<Serie> mObtenerSeries(String workoutId, String ejercicioId) {
+         ArrayList<Serie> lista = new ArrayList<>();
+         Firestore co = null;
+         try {
+             co = Conexion.conectar();
+             ApiFuture<QuerySnapshot> query = co.collection("workouts")
+                     .document(workoutId)
+                     .collection("ejercicios")
+                     .document(ejercicioId)
+                     .collection("Series")
+                     .get();
+             QuerySnapshot querySnapshot = query.get();
+             for (QueryDocumentSnapshot doc : querySnapshot.getDocuments()) {
+                 Serie s = new Serie();
+                 s.setNombre(doc.getId());
+                 Long cantidadL = doc.getLong("Cantidad");
+                 Long tiempoSerieL = doc.getLong("Tiempo_serie");
+                 Long tiempoDescL = doc.getLong("Tiempo_descanso");
+                 if (cantidadL != null) s.setCantidad(cantidadL.intValue());
+                 if (tiempoSerieL != null) s.setTiempo_serie(tiempoSerieL.intValue());
+                 if (tiempoDescL != null) s.setTiempo_descanso(tiempoDescL.intValue());
+                 lista.add(s);
+             }
+             co.close();
+         } catch (Exception e) {
+             System.out.println("Error mObtenerSeries");
+             e.printStackTrace();
+         }
+         return lista;
+     }
 }

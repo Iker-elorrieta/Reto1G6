@@ -98,7 +98,7 @@ public class Workout implements java.io.Serializable {
                 // Calcular duración sumando ejercicios
                 double durTotal = 0.0;
                 try {
-                    ArrayList<Ejercicio> ejercs = Ejercicio.mObtenerEjercicios(doc.getId());
+                    ArrayList<Ejercicio> ejercs = new Ejercicio().mObtenerEjercicios(doc.getId());
                     for (Ejercicio e : ejercs) {
                         durTotal += e.getDuracionMinutos();
                     }
@@ -145,12 +145,12 @@ public class Workout implements java.io.Serializable {
                 // Calcular duración sumando ejercicios relacionados a este workout
                 double durTotal = 0.0;
                 try {
-                    ArrayList<Ejercicio> ejercs = Ejercicio.mObtenerEjercicios(doc.getId());
+                    ArrayList<Ejercicio> ejercs = new Ejercicio().mObtenerEjercicios(doc.getId());
                     for (Ejercicio e : ejercs) {
                         durTotal += e.getDuracionMinutos();
                     }
                 } catch (Exception ex) {
-                    // ignorar errores al obtener ejercicios y dejar duración en 0
+                     // ignorar errores al obtener ejercicios y dejar duración en 0
                 }
                 w.setDuracionMinutos(durTotal);
 

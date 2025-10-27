@@ -92,50 +92,50 @@ public class Ejercicio extends Workout {
 
     // Obtiene los ejercicios para un workout y calcula métricas basadas en sus Series
     public static ArrayList<Ejercicio> mObtenerEjercicios(String workoutId) {
-        ArrayList<Ejercicio> lista = new ArrayList<>();
-        Firestore co = null;
-        try {
-            co = Conexion.conectar();
-            ApiFuture<QuerySnapshot> query = co.collection("workouts")
-                    .document(workoutId)
-                    .collection("ejercicios")
-                    .get();
-            QuerySnapshot querySnapshot = query.get();
-            for (QueryDocumentSnapshot doc : querySnapshot.getDocuments()) {
-                Ejercicio e = new Ejercicio();
-                e.setNombre(doc.getId());
-                e.setDescripcion(doc.getString("Descripcion"));
-                e.setImagen(doc.getString("Imagen"));
+         ArrayList<Ejercicio> lista = new ArrayList<>();
+         Firestore co = null;
+         try {
+             co = Conexion.conectar();
+             ApiFuture<QuerySnapshot> query = co.collection("workouts")
+                     .document(workoutId)
+                     .collection("ejercicios")
+                     .get();
+             QuerySnapshot querySnapshot = query.get();
+             for (QueryDocumentSnapshot doc : querySnapshot.getDocuments()) {
+                 Ejercicio e = new Ejercicio();
+                 e.setNombre(doc.getId());
+                 e.setDescripcion(doc.getString("Descripcion"));
+                 e.setImagen(doc.getString("Imagen"));
 
-                // Obtener series asociadas y calcular métricas
-                ArrayList<Serie> series = Serie.mObtenerSeries(workoutId, doc.getId());
-                int totalSeries = 0;
-                double totalDuracion = 0.0;
-                double totalDesc = 0.0;
-                double totalTserie = 0.0;
-                for (Serie s : series) {
-                    totalSeries += s.getCantidad();
-                    totalDuracion += s.getDuracionMinutos();
-                    totalDesc += s.getTiempo_descanso();
-                    totalTserie += s.getTiempo_serie();
-                }
-                e.setSeriesCount(series.size());
-                e.setDuracionMinutos(totalDuracion);
-                if (series.size() > 0) {
-                    e.setAvgTiempoDescanso(totalDesc / series.size());
-                    e.setAvgTiempoSerie(totalTserie / series.size());
-                } else {
-                    e.setAvgTiempoDescanso(0);
-                    e.setAvgTiempoSerie(0);
-                }
+                 // Obtener series asociadas y calcular métricas
+                 ArrayList<Serie> series = new Serie().mObtenerSeries(workoutId, doc.getId());
+                 int totalSeries = 0;
+                 double totalDuracion = 0.0;
+                 double totalDesc = 0.0;
+                 double totalTserie = 0.0;
+                 for (Serie s : series) {
+                     totalSeries += s.getCantidad();
+                     totalDuracion += s.getDuracionMinutos();
+                     totalDesc += s.getTiempo_descanso();
+                     totalTserie += s.getTiempo_serie();
+                 }
+                 e.setSeriesCount(series.size());
+                 e.setDuracionMinutos(totalDuracion);
+                 if (series.size() > 0) {
+                     e.setAvgTiempoDescanso(totalDesc / series.size());
+                     e.setAvgTiempoSerie(totalTserie / series.size());
+                 } else {
+                     e.setAvgTiempoDescanso(0);
+                     e.setAvgTiempoSerie(0);
+                 }
 
-                lista.add(e);
-            }
-            co.close();
-        } catch (Exception ex) {
-            System.out.println("Error: Clase Ejercicio - mObtenerEjercicios");
-            ex.printStackTrace();
-        }
-        return lista;
-    }
+                 lista.add(e);
+             }
+             co.close();
+         } catch (Exception ex) {
+             System.out.println("Error: Clase Ejercicio - mObtenerEjercicios");
+             ex.printStackTrace();
+         }
+         return lista;
+     }
 }
