@@ -114,7 +114,7 @@ public class ControladorUsuario implements ActionListener {
         this.vistaWorkouts.getBtnVolver().setActionCommand("VOLVER_WORKOUTS");
 
         try {
-            ArrayList<Workout> lista = (ArrayList<Workout>) Workout.mObtenerWorkouts();
+            ArrayList<Workout> lista = (ArrayList<Workout>) new Workout().mObtenerWorkouts();
             DefaultTableModel model = (DefaultTableModel) this.vistaWorkouts.getTableWorkouts().getModel();
          
             model.setRowCount(0);
@@ -149,7 +149,7 @@ public class ControladorUsuario implements ActionListener {
                  if (e.getClickCount() == 2) {
                      int row = vistaWorkouts.getTableWorkouts().getSelectedRow();
                      if (row >= 0) {
-                         String workoutId = String.valueOf(vistaWorkouts.getTableWorkouts().getValueAt(row, 0));
+                         final String workoutId = String.valueOf(vistaWorkouts.getTableWorkouts().getValueAt(row, 0));
                          mAbrirEjercicios(workoutId);
                      }
                  }
@@ -197,15 +197,15 @@ public class ControladorUsuario implements ActionListener {
     }
 
     private void mLoginUsuario() {
-        String email = this.vistaLogin.getTxtEmail().getText().trim();
-        String pass = new String(this.vistaLogin.getTxtPass().getPassword()).trim();
+        final String email = this.vistaLogin.getTxtEmail().getText().trim();
+        final String pass = new String(this.vistaLogin.getTxtPass().getPassword()).trim();
 
         if (email.isEmpty() || pass.isEmpty()) {
             this.vistaLogin.getLblErrores().setText("Email y contraseña son obligatorios");
             return;
         }
 
-        String emailId = email.toLowerCase();
+        final String emailId = email.toLowerCase();
         Usuario usuario = new Usuario();
         if (usuario.mAutenticarUsuario(emailId, pass)) {
 
@@ -213,7 +213,7 @@ public class ControladorUsuario implements ActionListener {
 
             // Sección revisada
             Vista.menu ventanaMenu = new Vista.menu();
-            String nombreParaMostrar;
+            final String nombreParaMostrar;
             if (usuario.getNombre() != null && !usuario.getNombre().isEmpty()) {
                 nombreParaMostrar = usuario.getNombre();
             } else {
@@ -286,18 +286,18 @@ public class ControladorUsuario implements ActionListener {
     }
 
     private void mRegistrarUsuario() {
-        String nombre = this.vistaRegistro.getTxtNombre().getText().trim();
-        String apellidos = this.vistaRegistro.getTxtApellidos().getText().trim();
-        String email = this.vistaRegistro.getTxtEmail().getText().trim();
-        String pass = new String(this.vistaRegistro.getTxtPass().getPassword()).trim();
-        String fechaNacStr = this.vistaRegistro.getTxtFechaNac().getText().trim();
+        final String nombre = this.vistaRegistro.getTxtNombre().getText().trim();
+        final String apellidos = this.vistaRegistro.getTxtApellidos().getText().trim();
+        final String email = this.vistaRegistro.getTxtEmail().getText().trim();
+        final String pass = new String(this.vistaRegistro.getTxtPass().getPassword()).trim();
+        final String fechaNacStr = this.vistaRegistro.getTxtFechaNac().getText().trim();
 
         if (nombre.isEmpty() || apellidos.isEmpty() || email.isEmpty() || pass.isEmpty()) {
             this.vistaRegistro.getLblErrores().setText("Todos los campos son obligatorios");
             return;
         }
 
-        String emailRegex = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
+        final String emailRegex = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$";
         if (!email.matches(emailRegex)) {
             this.vistaRegistro.getLblErrores().setText("Email inválido");
             return;
@@ -312,9 +312,9 @@ public class ControladorUsuario implements ActionListener {
 
         if (!fechaNacStr.isEmpty()) {
             try {
-                String normalized = fechaNacStr.replace('/', '-').trim();
+                final String normalized = fechaNacStr.replace('/', '-').trim();
                 SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-                //setLenient es pa poner que la fecha sea valida (fuente chatgtp)
+                //setLenientes pa poner que la fecha sea valida (fuente chatgtp)
                 df.setLenient(false); 
 
                 fechaNacimiento = df.parse(normalized);
@@ -335,7 +335,7 @@ public class ControladorUsuario implements ActionListener {
         Usuario usuario = new Usuario(nombre, apellidos, email, pass, fechaNacimiento);
 
         if (usuario.mAnadirUsuario()) {
-        	 this.vistaRegistro.limpiarCampos();
+		 	 this.vistaRegistro.limpiarCampos();
             this.vistaRegistro.getLblErrores().setText("Usuario registrado correctamente");
             
         } else {
@@ -357,10 +357,10 @@ public class ControladorUsuario implements ActionListener {
             return;
         }
 
-        String nombre = this.vistaPerfil.getTxtNombre().getText().trim();
-        String apellidos = this.vistaPerfil.getTxtApellidos().getText().trim();
-        String fechaNacStr = this.vistaPerfil.getTxtFechaNac().getText().trim();
-        String pass = new String(this.vistaPerfil.getTxtPass().getPassword()).trim();
+        final String nombre = this.vistaPerfil.getTxtNombre().getText().trim();
+        final String apellidos = this.vistaPerfil.getTxtApellidos().getText().trim();
+        final String fechaNacStr = this.vistaPerfil.getTxtFechaNac().getText().trim();
+        final String pass = new String(this.vistaPerfil.getTxtPass().getPassword()).trim();
 
         if (nombre.isEmpty() || apellidos.isEmpty()) {
             this.vistaPerfil.getLblErrores().setText("Nombre y apellidos son obligatorios");
@@ -370,7 +370,7 @@ public class ControladorUsuario implements ActionListener {
         java.util.Date fechaNacimiento = null;
         if (!fechaNacStr.isEmpty()) {
             try {
-                String normalized = fechaNacStr.replace('/', '-').trim();
+                final String normalized = fechaNacStr.replace('/', '-').trim();
                 java.text.SimpleDateFormat df = new java.text.SimpleDateFormat("dd-MM-yyyy");
                 fechaNacimiento = df.parse(normalized);
             } catch (java.text.ParseException pe) {
@@ -392,7 +392,7 @@ public class ControladorUsuario implements ActionListener {
             this.vistaPerfil.getLblErrores().setText("Datos actualizados correctamente");
 
             if (this.vistaMenu != null) {
-                String nombreParaMostrar;
+                final String nombreParaMostrar;
                 if (this.usuarioActual.getNombre() != null && !this.usuarioActual.getNombre().isEmpty()) {
                     nombreParaMostrar = this.usuarioActual.getNombre();
                 } else {
@@ -433,7 +433,7 @@ public class ControladorUsuario implements ActionListener {
             DefaultTableModel model = (DefaultTableModel) vistaEjercicios.getTableEjercicios().getModel();
             model.setRowCount(0);
 
-            ArrayList<Ejercicio> lista = Ejercicio.mObtenerEjercicios(workoutId);
+            ArrayList<Ejercicio> lista = new Ejercicio().mObtenerEjercicios(workoutId);
             for (Ejercicio e : lista) {
                 Object[] row = new Object[] {
                     e.getNombre(),
@@ -451,13 +451,12 @@ public class ControladorUsuario implements ActionListener {
                     int row = vistaEjercicios.getTableEjercicios().getSelectedRow();
                     if (row < 0) return;
 
-                    String ejercicioId = String.valueOf(vistaEjercicios.getTableEjercicios().getValueAt(row, 0));
+                    final String ejercicioId = String.valueOf(vistaEjercicios.getTableEjercicios().getValueAt(row, 0));
                     Ejercicio seleccionado = null;
                     for (Ejercicio ex : lista) {
                         if (seleccionado == null && ex.getNombre().equals(ejercicioId)) {
                             seleccionado = ex;
                         }
-                    
                     }
 
                     if (seleccionado != null) {

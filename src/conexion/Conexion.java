@@ -10,8 +10,8 @@ import com.google.cloud.firestore.FirestoreOptions;
 
 public class Conexion {
 	
-	private static String nombreJSON = "GymAppG6.json";
-	private static String projectID = "gymappreto1";
+	private static final String nombreJSON = "GymAppG6.json";
+	private static final String projectID = "gymappreto1";
 	
 	public static Firestore conectar() throws IOException {
 		FileInputStream serviceAccount;

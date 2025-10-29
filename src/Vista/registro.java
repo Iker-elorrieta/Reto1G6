@@ -27,6 +27,17 @@ public class registro extends JFrame {
 	private JButton btnVolver;
 	private JLabel lblErrores;
 
+	// UI constants
+	private final String IMG_LOGO_PATH = "media/logo1.png";
+	private final String TXT_REGISTRARSE = "Registrarse";
+	private final String TXT_NOMBRE = "Nombre:";
+	private final String TXT_APELLIDO = "Apellido:";
+	private final String BTN_VOLVER_TXT = "Volver";
+	private final String BTN_REGISTRAR_TXT = "Registrarme";
+	private final String TXT_FNAC = "F. Nacimiento:";
+	private final String TXT_CORREO = "Correo:";
+	private final String TXT_PASS = "Contraseña:";
+
 	/**
 	 * Launch the application.
 	 */
@@ -58,7 +69,7 @@ public class registro extends JFrame {
 		JLabel lblLogo = new JLabel("");
 		lblLogo.setBounds(369, 11, 174, 165);
 
-		ImageIcon iconoOriginal = new ImageIcon("media/logo1.png");
+		ImageIcon iconoOriginal = new ImageIcon(IMG_LOGO_PATH);
 		Image imagen = iconoOriginal.getImage();
 
 		Image imagenEscalada = imagen.getScaledInstance(170, 170, Image.SCALE_SMOOTH);
@@ -66,21 +77,21 @@ public class registro extends JFrame {
 
 		contentPane.add(lblLogo);
 		
-		JLabel lblRegistrarse = new JLabel("Registrarse");
+		JLabel lblRegistrarse = new JLabel(TXT_REGISTRARSE);
 		lblRegistrarse.setForeground(UIManager.getColor("Button.highlight"));
 		lblRegistrarse.setBackground(UIManager.getColor("Button.highlight"));
 		lblRegistrarse.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblRegistrarse.setBounds(369, 196, 179, 41);
 		contentPane.add(lblRegistrarse);
 		
-		JLabel lblNombre = new JLabel("Nombre:");
+		JLabel lblNombre = new JLabel(TXT_NOMBRE);
 		lblNombre.setForeground(Color.WHITE);
 		lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 27));
 		lblNombre.setBackground(Color.WHITE);
 		lblNombre.setBounds(98, 282, 164, 35);
 		contentPane.add(lblNombre);
 		
-		JLabel lblApellido = new JLabel("Apellido:");
+		JLabel lblApellido = new JLabel(TXT_APELLIDO);
 		lblApellido.setForeground(Color.WHITE);
 		lblApellido.setFont(new Font("Tahoma", Font.PLAIN, 27));
 		lblApellido.setBackground(Color.WHITE);
@@ -97,14 +108,14 @@ public class registro extends JFrame {
 		txtApellidos.setBounds(327, 328, 300, 35);
 		contentPane.add(txtApellidos);
 		
-		btnVolver = new JButton("Volver");
+		btnVolver = new JButton(BTN_VOLVER_TXT);
 		btnVolver.setForeground(new Color(240, 248, 255));
 		btnVolver.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnVolver.setBackground(new Color(139, 0, 0));
 		btnVolver.setBounds(10, 11, 89, 41);
 		contentPane.add(btnVolver);
 		
-		btnRegistrar = new JButton("Registrarme");
+		btnRegistrar = new JButton(BTN_REGISTRAR_TXT);
 		btnRegistrar.setForeground(new Color(240, 248, 255));
 		btnRegistrar.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnRegistrar.setBackground(new Color(139, 0, 0));
@@ -125,21 +136,21 @@ public class registro extends JFrame {
 		txtPass.setBounds(327, 466, 300, 35);
 		contentPane.add(txtPass);
 		
-		JLabel lblFNacimiento = new JLabel("F. Nacimiento:");
+		JLabel lblFNacimiento = new JLabel(TXT_FNAC);
 		lblFNacimiento.setForeground(Color.WHITE);
 		lblFNacimiento.setFont(new Font("Tahoma", Font.PLAIN, 27));
 		lblFNacimiento.setBackground(Color.WHITE);
 		lblFNacimiento.setBounds(98, 374, 217, 35);
 		contentPane.add(lblFNacimiento);
 		
-		JLabel lblCorreo = new JLabel("Correo:");
+		JLabel lblCorreo = new JLabel(TXT_CORREO);
 		lblCorreo.setForeground(Color.WHITE);
 		lblCorreo.setFont(new Font("Tahoma", Font.PLAIN, 27));
 		lblCorreo.setBackground(Color.WHITE);
 		lblCorreo.setBounds(98, 420, 217, 35);
 		contentPane.add(lblCorreo);
 		
-		JLabel lblContrasena = new JLabel("Contraseña:");
+		JLabel lblContrasena = new JLabel(TXT_PASS);
 		lblContrasena.setForeground(Color.WHITE);
 		lblContrasena.setFont(new Font("Tahoma", Font.PLAIN, 27));
 		lblContrasena.setBackground(Color.WHITE);

@@ -24,6 +24,15 @@ public class login extends JFrame {
 	private JButton btnRegistrar;
 	private JLabel lblErrores;
 
+	// UI text constants
+	private final String IMG_LOGO_PATH = "media/logo1.png";
+	private final String TXT_TITULO = "Iniciar Sesión";
+	private final String TXT_EMAIL = "Email:";
+	private final String TXT_PASS = "Contraseña:";
+	private final String TXT_ENTRAR = "Entrar";
+	private final String TXT_PREG_REG = "¿No estas registrado?";
+	private final String TXT_REGISTRAR = "Registrarme";
+
 	/**
 	 * Launch the application.
 	 */
@@ -55,7 +64,7 @@ public class login extends JFrame {
 		JLabel lblLogo = new JLabel("");
 		lblLogo.setBounds(369, 11, 174, 165);
 
-		ImageIcon iconoOriginal = new ImageIcon("media/logo1.png");
+		ImageIcon iconoOriginal = new ImageIcon(IMG_LOGO_PATH);
 		Image imagen = iconoOriginal.getImage();
 
 		Image imagenEscalada = imagen.getScaledInstance(170, 170, Image.SCALE_SMOOTH);
@@ -63,21 +72,21 @@ public class login extends JFrame {
 
 		contentPane.add(lblLogo);
 		
-		JLabel lblIniciarSesion = new JLabel("Iniciar Sesión");
+		JLabel lblIniciarSesion = new JLabel(TXT_TITULO);
 		lblIniciarSesion.setForeground(UIManager.getColor("Button.highlight"));
 		lblIniciarSesion.setBackground(UIManager.getColor("Button.highlight"));
 		lblIniciarSesion.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblIniciarSesion.setBounds(352, 187, 237, 41);
 		contentPane.add(lblIniciarSesion);
 		
-		JLabel lblCorreo = new JLabel("Email:");
+		JLabel lblCorreo = new JLabel(TXT_EMAIL);
 		lblCorreo.setForeground(Color.WHITE);
 		lblCorreo.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		lblCorreo.setBackground(Color.WHITE);
 		lblCorreo.setBounds(112, 282, 205, 41);
 		contentPane.add(lblCorreo);
 		
-		JLabel lblContrasena = new JLabel("Contraseña:");
+		JLabel lblContrasena = new JLabel(TXT_PASS);
 		lblContrasena.setForeground(Color.WHITE);
 		lblContrasena.setFont(new Font("Tahoma", Font.PLAIN, 30));
 		lblContrasena.setBackground(Color.WHITE);
@@ -94,21 +103,21 @@ public class login extends JFrame {
 		txtPass.setBounds(327, 349, 300, 35);
 		contentPane.add(txtPass);
 		
-		btnLogin = new JButton("Entrar");
+		btnLogin = new JButton(TXT_ENTRAR);
 		btnLogin.setForeground(new Color(240, 248, 255));
 		btnLogin.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnLogin.setBackground(new Color(139, 0, 0));
 		btnLogin.setBounds(538, 413, 89, 41);
 		contentPane.add(btnLogin);
 		
-		JLabel lblnoestasRegistrado = new JLabel("¿No estas registrado?");
+		JLabel lblnoestasRegistrado = new JLabel(TXT_PREG_REG);
 		lblnoestasRegistrado.setForeground(Color.WHITE);
 		lblnoestasRegistrado.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblnoestasRegistrado.setBackground(new Color(128, 0, 0));
 		lblnoestasRegistrado.setBounds(410, 500, 136, 35);
 		contentPane.add(lblnoestasRegistrado);
 		
-		btnRegistrar = new JButton("Registrarme");
+		btnRegistrar = new JButton(TXT_REGISTRAR);
 		btnRegistrar.setForeground(new Color(240, 248, 255));
 		btnRegistrar.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnRegistrar.setBackground(new Color(139, 0, 0));

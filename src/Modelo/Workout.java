@@ -12,7 +12,7 @@ import conexion.Conexion;
 
 public class Workout implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
-    private static final String collectionName = "workouts";
+    private final String collectionName = "workouts";
 
     private String Nombre; // será usado como id
     private String Descripcion;
@@ -74,7 +74,7 @@ public class Workout implements java.io.Serializable {
     }
 
     // Obtener todos los workouts y calcular su duración sumando duraciones de ejercicios
-    public static List<Workout> mObtenerWorkouts() {
+    public List<Workout> mObtenerWorkouts() {
         final List<Workout> lista = new ArrayList<>();
 
         try (final Firestore co = Conexion.conectar()) {
@@ -103,7 +103,7 @@ public class Workout implements java.io.Serializable {
                 // Calcular duración sumando ejercicios
                 double durTotal = 0.0;
                 try {
-                    final List<Ejercicio> ejercs = Ejercicio.mObtenerEjercicios(doc.getId());
+                    final List<Ejercicio> ejercs = new Ejercicio().mObtenerEjercicios(doc.getId());
                     for (final Ejercicio e : ejercs) {
                         durTotal += e.getDuracionMinutos();
                     }
@@ -161,7 +161,7 @@ public class Workout implements java.io.Serializable {
                 // Calcular duración sumando ejercicios relacionados a este workout
                 double durTotal = 0.0;
                 try {
-                    final List<Ejercicio> ejercs = Ejercicio.mObtenerEjercicios(doc.getId());
+                    final List<Ejercicio> ejercs = new Ejercicio().mObtenerEjercicios(doc.getId());
                     for (final Ejercicio e : ejercs) {
                         durTotal += e.getDuracionMinutos();
                     }

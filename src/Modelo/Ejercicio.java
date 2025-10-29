@@ -91,7 +91,7 @@ public class Ejercicio extends Workout {
     }
 
     // Obtiene los ejercicios para un workout y calcula métricas basadas en sus Series
-    public static ArrayList<Ejercicio> mObtenerEjercicios(String workoutId) {
+    public ArrayList<Ejercicio> mObtenerEjercicios(String workoutId) {
          ArrayList<Ejercicio> lista = new ArrayList<>();
          Firestore co = null;
          try {

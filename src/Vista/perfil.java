@@ -30,6 +30,16 @@ public class perfil extends JFrame {
 	private JButton btnVolver;
 	private JLabel lblErrores;
 
+	// UI constants
+	private final String IMG_LOGO_PATH = "media/logo1.png";
+	private final String TXT_TITULO = "Tu Perfil";
+	private final String TXT_NOMBRE = "Nombre:";
+	private final String TXT_APELLIDO = "Apellido:";
+	private final String TXT_FNAC = "F. Nacimiento:";
+	private final String TXT_CONTRASENA = "Contraseña:";
+	private final String BTN_CAMBIAR = "Cambiar datos";
+	private final String BTN_VOLVER = "Volver";
+
 	/**
 	 * Create the frame.
 	 */
@@ -45,7 +55,7 @@ public class perfil extends JFrame {
 		JLabel lblLogo = new JLabel("");
 		lblLogo.setBounds(10, 11, 174, 165);
 
-		ImageIcon iconoOriginal = new ImageIcon("media/logo1.png");
+		ImageIcon iconoOriginal = new ImageIcon(IMG_LOGO_PATH);
 		Image imagen = iconoOriginal.getImage();
 
 		Image imagenEscalada = imagen.getScaledInstance(170, 170, Image.SCALE_SMOOTH);
@@ -53,21 +63,21 @@ public class perfil extends JFrame {
 
 		contentPane.add(lblLogo);
 		
-		JLabel lblMenu = new JLabel("Tu Perfil");
+		JLabel lblMenu = new JLabel(TXT_TITULO);
 		lblMenu.setForeground(UIManager.getColor("Button.highlight"));
 		lblMenu.setBackground(UIManager.getColor("Button.highlight"));
 		lblMenu.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblMenu.setBounds(418, 35, 140, 41);
 		contentPane.add(lblMenu);
 		
-		JLabel lblNombre = new JLabel("Nombre:");
+		JLabel lblNombre = new JLabel(TXT_NOMBRE);
 		lblNombre.setForeground(Color.WHITE);
 		lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 27));
 		lblNombre.setBackground(Color.WHITE);
 		lblNombre.setBounds(98, 282, 164, 35);
 		contentPane.add(lblNombre);
 		
-		JLabel lblApellido = new JLabel("Apellido:");
+		JLabel lblApellido = new JLabel(TXT_APELLIDO);
 		lblApellido.setForeground(Color.WHITE);
 		lblApellido.setFont(new Font("Tahoma", Font.PLAIN, 27));
 		lblApellido.setBackground(Color.WHITE);
@@ -93,28 +103,28 @@ public class perfil extends JFrame {
 		txtPass.setBounds(327, 420, 300, 35);
 		contentPane.add(txtPass);
 		
-		JLabel lblFNacimiento = new JLabel("F. Nacimiento:");
+		JLabel lblFNacimiento = new JLabel(TXT_FNAC);
 		lblFNacimiento.setForeground(Color.WHITE);
 		lblFNacimiento.setFont(new Font("Tahoma", Font.PLAIN, 27));
 		lblFNacimiento.setBackground(Color.WHITE);
 		lblFNacimiento.setBounds(98, 374, 217, 35);
 		contentPane.add(lblFNacimiento);
 		
-		JLabel lblContrasena = new JLabel("Contraseña:");
+		JLabel lblContrasena = new JLabel(TXT_CONTRASENA);
 		lblContrasena.setForeground(Color.WHITE);
 		lblContrasena.setFont(new Font("Tahoma", Font.PLAIN, 27));
 		lblContrasena.setBackground(Color.WHITE);
 		lblContrasena.setBounds(98, 420, 217, 35);
 		contentPane.add(lblContrasena);
 		
-		btnCambiarDatos = new JButton("Cambiar datos");
+		btnCambiarDatos = new JButton(BTN_CAMBIAR);
 		btnCambiarDatos.setForeground(new Color(240, 248, 255));
 		btnCambiarDatos.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnCambiarDatos.setBackground(new Color(139, 0, 0));
 		btnCambiarDatos.setBounds(358, 474, 237, 41);
 		contentPane.add(btnCambiarDatos);
 		
-		btnVolver = new JButton("Volver");
+		btnVolver = new JButton(BTN_VOLVER);
 		btnVolver.setForeground(new Color(240, 248, 255));
 		btnVolver.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnVolver.setBackground(new Color(139, 0, 0));
@@ -162,7 +172,7 @@ public class perfil extends JFrame {
   
      private String formatearFecha(java.util.Date d) {
          if (d == null) {
-        	 return "";}
+	     	 return "";}
          SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
          return df.format(d);
      }

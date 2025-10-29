@@ -6,18 +6,17 @@ import LecturaPB.lectura;
 
 public class HiloBackup extends Thread {
 
-	
-	
+	private final String CMD_JAVA = "java";
+	private final String FLAG_JAR = "-jar";
+	private final String BACKUP_JAR = "backups.jar";
+
 	public HiloBackup() {
 	}
-	
-	
-
 
 	public void run() {
 		// Para llamar la clase lectura y guardar los datos en los archivos .dat
 		try {
-			ProcessBuilder pb = new ProcessBuilder("java", "-jar", "backups.jar");
+			ProcessBuilder pb = new ProcessBuilder(CMD_JAVA, FLAG_JAR, BACKUP_JAR);
 
 			// Redirigimos la salida para ver mensajes en la consola 
 			pb.inheritIO();
@@ -43,8 +42,4 @@ public class HiloBackup extends Thread {
 
 	}
 
-	
-	
-	
-	
 }

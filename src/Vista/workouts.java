@@ -23,6 +23,13 @@ public class workouts extends JFrame {
 	private JPanel contentPane;
 	private JButton btnVolver;
 	private JTable tableWorkouts;
+
+	// UI constants
+	private final String IMG_LOGO_PATH = "media/logo1.png";
+	private final String TXT_TITULO = "WORKOUTS";
+	private final String BTN_VOLVER_TXT = "Volver";
+	private final String[] TABLE_HEADERS = new String[] { "Nombre", "Nivel", "Duración", "Video" };
+
 	/**
 	 * Launch the application.
 	 */
@@ -54,7 +61,7 @@ public class workouts extends JFrame {
 		JLabel lblLogo = new JLabel("");
 		lblLogo.setBounds(10, 11, 174, 165);
 
-		ImageIcon iconoOriginal = new ImageIcon("media/logo1.png");
+		ImageIcon iconoOriginal = new ImageIcon(IMG_LOGO_PATH);
 		Image imagen = iconoOriginal.getImage();
 
 		Image imagenEscalada = imagen.getScaledInstance(170, 170, Image.SCALE_SMOOTH);
@@ -62,7 +69,7 @@ public class workouts extends JFrame {
 
 		contentPane.add(lblLogo);
 		
-		JLabel lblWorkouts = new JLabel("WORKOUTS");
+		JLabel lblWorkouts = new JLabel(TXT_TITULO);
 		lblWorkouts.setForeground(Color.WHITE);
 		lblWorkouts.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblWorkouts.setBackground(Color.WHITE);
@@ -70,7 +77,7 @@ public class workouts extends JFrame {
 		contentPane.add(lblWorkouts);
 		
 		
-		btnVolver = new JButton("Volver");
+		btnVolver = new JButton(BTN_VOLVER_TXT);
 		btnVolver.setForeground(new Color(240, 248, 255));
 		btnVolver.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnVolver.setBackground(new Color(139, 0, 0));
@@ -90,7 +97,7 @@ public class workouts extends JFrame {
 				{null, null, null, null},
 				{null, null, null, null},
 				{null, null, null, null},
-			}, new String[] { "Nombre", "Nivel", "Duraci\u00F3n", "Video" }) {
+			}, TABLE_HEADERS) {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public boolean isCellEditable(int row, int column) {

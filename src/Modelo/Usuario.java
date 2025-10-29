@@ -30,13 +30,14 @@ public class Usuario implements Serializable {
 	private double nivel;
 	private String tipoUsuario;
 
-	private static String collectionName = "usuarios";
-	private static String fieldNombre = "nombre";
-	private static String fieldApellidos = "apellidos";
-	private static String fieldPass = "pass";
-	private static String fieldFechaNacimiento = "fnacimiento";
-	private static String fieldNivel = "nivel";
-	private static String fieldTipoUsuario = "tipoUsuario";
+	// Convertir constantes de clase a final de instancia para evitar static innecesario
+	private final String collectionName = "usuarios";
+	private final String fieldNombre = "nombre";
+	private final String fieldApellidos = "apellidos";
+	private final String fieldPass = "pass";
+	private final String fieldFechaNacimiento = "fnacimiento";
+	private final String fieldNivel = "nivel";
+	private final String fieldTipoUsuario = "tipoUsuario";
 
 	public Usuario() {
 	}
