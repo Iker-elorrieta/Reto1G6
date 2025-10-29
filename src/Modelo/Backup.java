@@ -17,11 +17,11 @@ public class Backup {
                 b.guardarUsuarios(new Usuario().mObtenerUsuarios());
 
             } else if (arg.equals("workouts")) {
-                b.guardarWorkouts(new Workout().obtenerWorkouts((long) maxLevel));
+                b.guardarWorkouts((ArrayList<Workout>) new Workout().obtenerWorkouts((long) maxLevel));
 
             } else if (arg.equals("both")) {
                 b.guardarUsuarios(new Usuario().mObtenerUsuarios());
-                b.guardarWorkouts(new Workout().obtenerWorkouts((long) maxLevel));
+                b.guardarWorkouts((ArrayList<Workout>) new Workout().obtenerWorkouts((long) maxLevel));
 
             } else {
                 System.out.println("Argumento no válido: " + a);

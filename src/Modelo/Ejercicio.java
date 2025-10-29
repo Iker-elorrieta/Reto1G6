@@ -109,12 +109,12 @@ public class Ejercicio extends Workout {
 
                  // Obtener series asociadas y calcular métricas
                  ArrayList<Serie> series = new Serie().mObtenerSeries(workoutId, doc.getId());
-                 int totalSeries = 0;
+                 //int totalSeries = 0;
                  double totalDuracion = 0.0;
                  double totalDesc = 0.0;
                  double totalTserie = 0.0;
                  for (Serie s : series) {
-                     totalSeries += s.getCantidad();
+                    // totalSeries += s.getCantidad();
                      totalDuracion += s.getDuracionMinutos();
                      totalDesc += s.getTiempo_descanso();
                      totalTserie += s.getTiempo_serie();
@@ -133,7 +133,7 @@ public class Ejercicio extends Workout {
              }
              co.close();
          } catch (Exception ex) {
-             System.out.println("Error: Clase Ejercicio - mObtenerEjercicios");
+             System.out.println("Error Obtener Ejercicios");
              ex.printStackTrace();
          }
          return lista;

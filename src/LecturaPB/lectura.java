@@ -72,7 +72,6 @@ public class lectura {
 		}
 	}
 
-	// Nuevo método: genera un XML con el histórico de workouts por usuario
 	public static void guardarHistoricoWorkoutsXML() {
 		Firestore co = null;
 		try {
@@ -94,7 +93,6 @@ public class lectura {
 				for (QueryDocumentSnapshot histDoc : histSnapshot.getDocuments()) {
 					Element histElem = doc.createElement("historico_wo");
 
-					// opcional: añadir id del usuario como elemento
 					Element usuarioElem = doc.createElement("usuario_id");
 					String usuarioIdStr = "";
 					if (userId != null) {
@@ -203,7 +201,7 @@ public class lectura {
 			usuarios = new ArrayList<>();
 		}
 		try {
-			workouts = new Workout().obtenerWorkouts((long) maxLevel);
+			workouts = (ArrayList<Workout>) new Workout().obtenerWorkouts((long) maxLevel);
 			System.out.println("workouts obtenidos");
 		} catch (Exception e) {
 			System.err.println("no se pudieron obtener workouts: " + e.getMessage());

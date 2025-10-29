@@ -14,7 +14,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-import LecturaPB.lectura; // import simple para generar backups
 import Modelo.Ejercicio;
 import Modelo.HiloBackup;
 import Modelo.Usuario;
@@ -96,17 +95,17 @@ public class ControladorUsuario implements ActionListener {
     }
     
     //Para comprobar la conexión al servidor, SPRINT2
-    private boolean comprobarConexion() {
-        boolean conexionOK = false;
-        try {
-            Usuario u = new Usuario();
-            u.mObtenerUsuarios();
-            conexionOK = true;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error de conexión con el servidor.", null, JOptionPane.ERROR_MESSAGE);
-        }
-        return conexionOK;
-    }
+  //  private boolean comprobarConexion() {
+    //    boolean conexionOK = false;
+      //  try {
+        //    Usuario u = new Usuario();
+          //  u.mObtenerUsuarios();
+            //conexionOK = true;
+      //  } catch (Exception e) {
+        //    JOptionPane.showMessageDialog(null, "Error de conexión con el servidor.", null, JOptionPane.ERROR_MESSAGE);
+       // }
+       // return conexionOK;
+    // }
 
     // Inicializador para la vista workouts
     private void inicializarControladorWorkouts() {
@@ -115,7 +114,7 @@ public class ControladorUsuario implements ActionListener {
         this.vistaWorkouts.getBtnVolver().setActionCommand("VOLVER_WORKOUTS");
 
         try {
-            ArrayList<Workout> lista = Workout.mObtenerWorkouts();
+            ArrayList<Workout> lista = (ArrayList<Workout>) Workout.mObtenerWorkouts();
             DefaultTableModel model = (DefaultTableModel) this.vistaWorkouts.getTableWorkouts().getModel();
          
             model.setRowCount(0);
@@ -159,20 +158,20 @@ public class ControladorUsuario implements ActionListener {
     }
 
     // Nuevo constructor 
-    public ControladorUsuario(Vista.workouts vistaWorkouts, Vista.menu vistaMenu, Usuario usuario) {
+    public ControladorUsuario(final Vista.workouts vistaWorkouts, final Vista.menu vistaMenu, final Usuario usuario) {
         this.vistaWorkouts = vistaWorkouts;
         this.vistaMenu = vistaMenu;
         this.usuarioActual = usuario;
         this.inicializarControladorWorkouts();
     }
 
-    public ControladorUsuario(Vista.workouts vistaWorkouts, Vista.menu vistaMenu) {
+    public ControladorUsuario(final Vista.workouts vistaWorkouts, final Vista.menu vistaMenu) {
         this(vistaWorkouts, vistaMenu, null);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String comando = e.getActionCommand();
+        final String comando = e.getActionCommand();
 
         if ("LOGIN_USUARIO".equals(comando)) {
             this.mLoginUsuario();
@@ -312,9 +311,14 @@ public class ControladorUsuario implements ActionListener {
         Date fechaNacimiento = null;
         if (!fechaNacStr.isEmpty()) {
             try {
+            	
                 String normalized = fechaNacStr.replace('/', '-').trim();
                 SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
                 fechaNacimiento = df.parse(normalized);
+                // Verificar que la fecha no sea futura con after
+                 if (fechaNacimiento.after(new Date())) {
+					this.vistaRegistro.getLblErrores().setText("La fecha de nacimiento no puede ser futura");
+					return;}
             } catch (ParseException pe) {
                 this.vistaRegistro.getLblErrores().setText("Formato de fecha incorrecto. Usa dd-MM-aaaa");
                 return;
@@ -324,8 +328,9 @@ public class ControladorUsuario implements ActionListener {
         Usuario usuario = new Usuario(nombre, apellidos, email, pass, fechaNacimiento);
 
         if (usuario.mAnadirUsuario()) {
+        	 this.vistaRegistro.limpiarCampos();
             this.vistaRegistro.getLblErrores().setText("Usuario registrado correctamente");
-            this.vistaRegistro.limpiarCampos();
+            
         } else {
             this.vistaRegistro.getLblErrores().setText("Error al registrar usuario - El email ya existe");
         }
@@ -376,7 +381,7 @@ public class ControladorUsuario implements ActionListener {
 
         boolean ok = this.usuarioActual.mActualizarUsuario();
         if (ok) {
-            // Sección revisada, reemplazando ternario y haciendo natural
+         
             this.vistaPerfil.getLblErrores().setText("Datos actualizados correctamente");
 
             if (this.vistaMenu != null) {
@@ -413,7 +418,7 @@ public class ControladorUsuario implements ActionListener {
     }
    
 
-    // Sección revisada: mAbrirEjercicios
+  
     private void mAbrirEjercicios(String workoutId) {
         try {
             vistaEjercicios = new Vista.ejercicios();
