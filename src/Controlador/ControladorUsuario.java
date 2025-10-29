@@ -309,20 +309,27 @@ public class ControladorUsuario implements ActionListener {
         }
 
         Date fechaNacimiento = null;
+
         if (!fechaNacStr.isEmpty()) {
             try {
-            	
                 String normalized = fechaNacStr.replace('/', '-').trim();
                 SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+                //setLenient es pa poner que la fecha sea valida (fuente chatgtp)
+                df.setLenient(false); 
+
                 fechaNacimiento = df.parse(normalized);
-                // Verificar que la fecha no sea futura con after
-                 if (fechaNacimiento.after(new Date())) {
-					this.vistaRegistro.getLblErrores().setText("La fecha de nacimiento no puede ser futura");
-					return;}
+
+                
+                if (fechaNacimiento.after(new Date())) {
+                    this.vistaRegistro.getLblErrores().setText("La fecha de nacimiento no puede ser futura");
+                    return;
+                }
+
             } catch (ParseException pe) {
-                this.vistaRegistro.getLblErrores().setText("Formato de fecha incorrecto. Usa dd-MM-aaaa");
+                this.vistaRegistro.getLblErrores().setText("Fecha inválida o en formato incorrecto. Usa dd-MM-aaaa");
                 return;
             }
+        
         }
 
         Usuario usuario = new Usuario(nombre, apellidos, email, pass, fechaNacimiento);

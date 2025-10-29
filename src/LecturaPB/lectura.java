@@ -181,7 +181,7 @@ public class lectura {
 				transformer.transform(source, result);
 			}
 
-			System.out.println("escrito");
+			System.out.println("escrito XML");
 
 		} catch (Exception e) {
 			e.printStackTrace();
