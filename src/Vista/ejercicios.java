@@ -114,6 +114,13 @@ public class ejercicios extends JFrame {
 		lblImg = new JLabel("");
 		lblImg.setBounds(312, 355, 293, 224);
 		contentPane.add(lblImg);
+		
+		JButton btnEmpezarWO = new JButton("Empezar Workout");
+		btnEmpezarWO.setForeground(new Color(240, 248, 255));
+		btnEmpezarWO.setFont(new Font("Tahoma", Font.BOLD, 16));
+		btnEmpezarWO.setBackground(new Color(139, 0, 0));
+		btnEmpezarWO.setBounds(652, 538, 174, 41);
+		contentPane.add(btnEmpezarWO);
 
 	}
 	public JButton getBtnVolver() { return btnVolver; }
