@@ -524,6 +524,26 @@ public class ControladorUsuario implements ActionListener {
                 }
             });
 
+            // Añadimos listener para abrir entrenamiento con el workout actual
+            vistaEjercicios.getBtnEmpezarWO().addActionListener(new java.awt.event.ActionListener() {
+                @Override
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    try {
+                        // Abrir ventana de entrenamiento
+                        Vista.entrenamiento ventanaEntreno = new Vista.entrenamiento();
+                        ventanaEntreno.setNombreWorkout( String.valueOf(workoutId) );
+                        // Pasamos la lista de ejercicios y datos al controlador específico
+                        new Controlador.ControladorEntrenamiento(ventanaEntreno, lista, workoutId, usuarioActual, vistaWorkouts, vistaEjercicios);
+                        ventanaEntreno.setVisible(true);
+                        if (vistaWorkouts != null) vistaWorkouts.setVisible(false);
+                        if (vistaEjercicios != null) { vistaEjercicios.setVisible(false); vistaEjercicios.dispose(); }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        javax.swing.JOptionPane.showMessageDialog(null, "Error al iniciar entrenamiento", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+
             // Botón volver en ejercicios
             vistaEjercicios.getBtnVolver().addActionListener(new ActionListener() {
                 @Override

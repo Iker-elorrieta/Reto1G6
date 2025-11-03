@@ -24,6 +24,7 @@ public class ejercicios extends JFrame {
 	private JTable table;
 	private JLabel lblDescripcion;
 	private JLabel lblImg;
+	private JButton btnEmpezarWO;
 
 	// UI constants
 	private final String IMG_LOGO_PATH = "media/logo1.png";
@@ -115,7 +116,7 @@ public class ejercicios extends JFrame {
 		lblImg.setBounds(312, 355, 293, 224);
 		contentPane.add(lblImg);
 		
-		JButton btnEmpezarWO = new JButton("Empezar Workout");
+		btnEmpezarWO = new JButton("Empezar Workout");
 		btnEmpezarWO.setForeground(new Color(240, 248, 255));
 		btnEmpezarWO.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnEmpezarWO.setBackground(new Color(139, 0, 0));
@@ -127,4 +128,5 @@ public class ejercicios extends JFrame {
 	public JTable getTableEjercicios() { return table; }
 	public JLabel getLblDescripcion() { return lblDescripcion; }
 	public JLabel getLblImg() { return lblImg; }
+	public JButton getBtnEmpezarWO() { return btnEmpezarWO; }
 }

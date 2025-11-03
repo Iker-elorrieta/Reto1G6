@@ -4,12 +4,24 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import Modelo.CronometroThread;
-
 public class entrenamiento extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
+
+    // Componentes accesibles desde el controlador (campos de instancia)
+    private JLabel lblTWorkout;
+    private JLabel lblTEjercicio;
+    private JLabel lblTSerie;
+    private JLabel lblTDescanso;
+    private JLabel lblNumSeriesRestantes;
+    private JLabel lblNumDescansoRestantes;
+    private JLabel lblNombreEjercicio;
+    private JLabel lblNombreWorkout;
+    private JLabel lblDescripcionEjercicio;
+    private JLabel lblImagenEjercicio;
+    private JButton btnTerminar;
+    private JButton btnPararEmpezar;
 
     private final String IMG_LOGO_PATH = "media/logo1.png";
     private final String TXT_TITULO = "Entrenamiento";
@@ -58,12 +70,13 @@ public class entrenamiento extends JFrame {
         contentPane.add(panel);
         panel.setLayout(null);
 
-        JLabel lblTWorkout = new JLabel("Tiempo Workout: 00:00 mins");
+        // Usar campos de instancia en lugar de variables locales
+        lblTWorkout = new JLabel("Tiempo Workout: 00:00 mins");
         lblTWorkout.setForeground(Color.WHITE);
         lblTWorkout.setBounds(0, 0, 174, 53);
         panel.add(lblTWorkout);
 
-        JButton btnTerminar = new JButton("Terminar");
+        btnTerminar = new JButton("Terminar");
         btnTerminar.setBackground(new Color(139, 0, 0));
         btnTerminar.setForeground(Color.BLACK);
         btnTerminar.setBounds(529, 466, 90, 53);
@@ -75,7 +88,7 @@ public class entrenamiento extends JFrame {
         panel_1.setBounds(10, 251, 174, 53);
         contentPane.add(panel_1);
 
-        JLabel lblTEjercicio = new JLabel("Tiempo Ejercicio: 00:00 mins");
+        lblTEjercicio = new JLabel("Tiempo Ejercicio: 00:00 mins");
         lblTEjercicio.setForeground(Color.WHITE);
         lblTEjercicio.setBounds(0, 0, 174, 53);
         panel_1.add(lblTEjercicio);
@@ -86,7 +99,7 @@ public class entrenamiento extends JFrame {
         panel_3.setBounds(734, 251, 174, 53);
         contentPane.add(panel_3);
 
-        JLabel lblNombreEjercicio = new JLabel("Ejercicio:");
+        lblNombreEjercicio = new JLabel("Ejercicio:");
         lblNombreEjercicio.setForeground(Color.WHITE);
         lblNombreEjercicio.setBounds(0, 0, 174, 53);
         panel_3.add(lblNombreEjercicio);
@@ -97,7 +110,7 @@ public class entrenamiento extends JFrame {
         panel_2.setBounds(734, 187, 174, 53);
         contentPane.add(panel_2);
 
-        JLabel lblNombreWorkout = new JLabel("Workout:");
+        lblNombreWorkout = new JLabel("Workout:");
         lblNombreWorkout.setForeground(Color.WHITE);
         lblNombreWorkout.setBounds(0, 0, 174, 53);
         panel_2.add(lblNombreWorkout);
@@ -108,7 +121,7 @@ public class entrenamiento extends JFrame {
         panel_5.setBounds(734, 315, 174, 117);
         contentPane.add(panel_5);
 
-        JLabel lblDescripcionEjercicio = new JLabel("Descripción:");
+        lblDescripcionEjercicio = new JLabel("Descripción:");
         lblDescripcionEjercicio.setVerticalAlignment(SwingConstants.TOP);
         lblDescripcionEjercicio.setForeground(Color.WHITE);
         lblDescripcionEjercicio.setBounds(0, 0, 174, 117);
@@ -126,13 +139,13 @@ public class entrenamiento extends JFrame {
         lbl1.setBounds(38, 11, 144, 27);
         panel_5_1.add(lbl1);
 
-        JLabel lblTSerie = new JLabel("00:00");
+        lblTSerie = new JLabel("00:00");
         lblTSerie.setForeground(Color.WHITE);
         lblTSerie.setFont(new Font("Tahoma", Font.BOLD, 49));
         lblTSerie.setBounds(38, 56, 144, 119);
         panel_5_1.add(lblTSerie);
 
-        JLabel lblNumSeriesRestantes = new JLabel("Series restantes: 0");
+        lblNumSeriesRestantes = new JLabel("Series restantes: 0");
         lblNumSeriesRestantes.setFont(new Font("Tahoma", Font.PLAIN, 13));
         lblNumSeriesRestantes.setBounds(48, 181, 114, 53);
         panel_5_1.add(lblNumSeriesRestantes);
@@ -150,51 +163,100 @@ public class entrenamiento extends JFrame {
         lbl2.setBounds(10, 11, 197, 27);
         panel_5_1_1.add(lbl2);
 
-        JLabel lblTDescanso = new JLabel("00:00");
+        lblTDescanso = new JLabel("00:00");
         lblTDescanso.setForeground(Color.WHITE);
         lblTDescanso.setFont(new Font("Tahoma", Font.BOLD, 49));
         lblTDescanso.setBounds(35, 56, 144, 119);
         panel_5_1_1.add(lblTDescanso);
 
-        JLabel lblNumDescansoRestantes = new JLabel("Descansos restantes: 0");
+        lblNumDescansoRestantes = new JLabel("Descansos restantes: 0");
         lblNumDescansoRestantes.setForeground(Color.WHITE);
         lblNumDescansoRestantes.setFont(new Font("Tahoma", Font.PLAIN, 13));
         lblNumDescansoRestantes.setBounds(45, 181, 134, 53);
         panel_5_1_1.add(lblNumDescansoRestantes);
 
-        JButton btnPararEmpezar = new JButton("Empezar");
+        btnPararEmpezar = new JButton("Empezar");
         btnPararEmpezar.setForeground(Color.BLACK);
         btnPararEmpezar.setBackground(new Color(139, 0, 0));
         btnPararEmpezar.setBounds(291, 466, 90, 53);
         contentPane.add(btnPararEmpezar);
 
-        JLabel lblImagenEjercicio = new JLabel("");
+        lblImagenEjercicio = new JLabel("");
         lblImagenEjercicio.setBounds(10, 315, 174, 117);
         contentPane.add(lblImagenEjercicio);
 
-        // 🔹 Aquí empieza la lógica del cronómetro
-        final CronometroThread crono = new CronometroThread(lblTWorkout);
-        crono.start();
-
-        btnPararEmpezar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                if (!crono.isEnEjecucion()) {
-                    crono.iniciar();
-                    btnPararEmpezar.setText("Pausar");
-                } else {
-                    crono.pausar();
-                    btnPararEmpezar.setText("Empezar");
-                }
-            }
-        });
-
-        // Botón "Terminar" para detener el hilo
-        btnTerminar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                crono.detener();
-                btnPararEmpezar.setEnabled(false);
-            }
-        });
+        // La lógica de hilos la gestiona el controlador específico
     }
+
+    public JButton getBtnTerminar() { return btnTerminar; }
+    public JButton getBtnPararEmpezar() { return btnPararEmpezar; }
+    public JLabel getLblTWorkout() { return lblTWorkout; }
+    public JLabel getLblTSerie() { return lblTSerie; }
+    public JLabel getLblTDescanso() { return lblTDescanso; }
+    public JLabel getLblTEjercicio() { return lblTEjercicio; }
+
+    // Métodos adicionales usados por controladores
+    public void setNombreWorkout(String nombre) { this.lblNombreWorkout.setText("Workout: " + (nombre == null ? "" : nombre)); }
+    public void setNombreEjercicio(String nombre) { this.lblNombreEjercicio.setText("Ejercicio: " + (nombre == null ? "" : nombre)); }
+    public void setDescripcionEjercicio(String desc) { this.lblDescripcionEjercicio.setText("Descripción: " + (desc == null ? "" : desc)); }
+    public void setImagenEjercicio(String img) {
+        java.awt.Image orig = null;
+        try {
+            java.io.File f = new java.io.File(img);
+            if (f.exists()) orig = new javax.swing.ImageIcon(f.getAbsolutePath()).getImage();
+        } catch (Exception ex) {
+        }
+        if (orig == null) {
+            try {
+                // Intentar como recurso en classpath
+                java.net.URL res = Controlador.ControladorEntrenamiento.class.getResource("/" + img);
+                if (res != null) orig = new javax.swing.ImageIcon(res).getImage();
+            } catch (Exception ex) {
+            }
+        }
+        if (orig == null) {
+            try {
+                orig = new javax.swing.ImageIcon(img).getImage();
+            } catch (Exception ex) {
+                orig = null;
+            }
+        }
+        // Intentar buscar en carpeta media/ si no se encontró aún
+        if (orig == null && img != null && !img.isEmpty()) {
+            try {
+                String mediaPath = "media/" + img;
+                java.io.File f2 = new java.io.File(mediaPath);
+                if (f2.exists()) orig = new javax.swing.ImageIcon(f2.getAbsolutePath()).getImage();
+            } catch (Exception ex) {
+            }
+        }
+        if (orig != null) {
+            int lw = lblImagenEjercicio.getWidth();
+            int lh = lblImagenEjercicio.getHeight();
+            if (lw <= 0) lw = 174;
+            if (lh <= 0) lh = 117;
+            int ow = orig.getWidth(null);
+            int oh = orig.getHeight(null);
+            if (ow > 0 && oh > 0) {
+                double scale = Math.min((double) lw / ow, (double) lh / oh);
+                int nw = (int) Math.max(1, Math.round(ow * scale));
+                int nh = (int) Math.max(1, Math.round(oh * scale));
+                java.awt.Image scaled = orig.getScaledInstance(nw, nh, java.awt.Image.SCALE_SMOOTH);
+                lblImagenEjercicio.setIcon(new javax.swing.ImageIcon(scaled));
+                lblImagenEjercicio.setText("");
+            } else {
+                lblImagenEjercicio.setIcon(new javax.swing.ImageIcon(orig));
+                lblImagenEjercicio.setText("");
+            }
+        } else {
+            lblImagenEjercicio.setIcon(null);
+            lblImagenEjercicio.setText("Imagen no disponible");
+        }
+    }
+
+    public void setSeriesRestantes(int n) { this.lblNumSeriesRestantes.setText("Series restantes: " + n); }
+    public void setDescansosRestantes(int n) { this.lblNumDescansoRestantes.setText("Descansos restantes: " + n); }
+    public void setTextoTiempoSerie(String t) { this.lblTSerie.setText(t); }
+    public void setTextoTiempoEjercicio(String t) { this.lblTEjercicio.setText(t); }
+
 }
-	

@@ -109,17 +109,19 @@ public class Ejercicio extends Workout {
 
                  // Obtener series asociadas y calcular métricas
                  ArrayList<Serie> series = new Serie().mObtenerSeries(workoutId, doc.getId());
-                 //int totalSeries = 0;
                  double totalDuracion = 0.0;
                  double totalDesc = 0.0;
                  double totalTserie = 0.0;
+                 int totalCantSeries = 0;
                  for (Serie s : series) {
-                    // totalSeries += s.getCantidad();
                      totalDuracion += s.getDuracionMinutos();
                      totalDesc += s.getTiempo_descanso();
                      totalTserie += s.getTiempo_serie();
+                     // contar la cantidad de repeticiones/series reales según Serie.Cantidad
+                     totalCantSeries += s.getCantidad();
                  }
-                 e.setSeriesCount(series.size());
+                 // Ahora usamos la suma de 'Cantidad' para seriesCount
+                 e.setSeriesCount(totalCantSeries);
                  e.setDuracionMinutos(totalDuracion);
                  if (series.size() > 0) {
                      e.setAvgTiempoDescanso(totalDesc / series.size());

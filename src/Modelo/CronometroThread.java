@@ -8,10 +8,46 @@ public class CronometroThread extends Thread {
     private boolean detenido = false;
     private long tiempoInicio = 0;
     private long tiempoAcumulado = 0;
-    private JLabel label; 
+    private final JLabel label;
 
+    // Si duracionInicialMillis > 0, el cronómetro funciona como cuenta atrás
+    private final long duracionInicialMillis;
+    private boolean modoCuentaAtras = false;
+
+    // Prefijo para modo progresivo (no cuenta atrás)
+    private final String prefijoTexto;
+
+    // Listener para notificar fin de cuenta atrás
+    public interface CronometroListener {
+        void terminado();
+    }
+
+    private CronometroListener listener = null;
+
+    // Constructor por defecto (stopwatch) con prefijo por defecto
     public CronometroThread(JLabel label) {
+        this(label, 0, "Tiempo Workout:");
+    }
+
+    // Constructor con prefijo para modo stopwatch
+    public CronometroThread(JLabel label, String prefijo) {
+        this(label, 0, prefijo);
+    }
+
+    // Constructor para cuenta atrás y/o prefijo personalizado
+    public CronometroThread(JLabel label, long duracionInicialMillis) {
+        this(label, duracionInicialMillis, "Tiempo Workout:");
+    }
+
+    public CronometroThread(JLabel label, long duracionInicialMillis, String prefijo) {
         this.label = label;
+        this.duracionInicialMillis = duracionInicialMillis;
+        this.modoCuentaAtras = duracionInicialMillis > 0;
+        this.prefijoTexto = (prefijo == null) ? "" : prefijo;
+    }
+
+    public void setListener(CronometroListener l) {
+        this.listener = l;
     }
 
     public void run() {
@@ -19,23 +55,48 @@ public class CronometroThread extends Thread {
             if (enEjecucion) {
                 long tiempoActual = System.currentTimeMillis();
                 long transcurrido = tiempoAcumulado + (tiempoActual - tiempoInicio);
-                actualizarLabel(transcurrido);
+                if (modoCuentaAtras) {
+                    long restante = duracionInicialMillis - transcurrido;
+                    if (restante <= 0) {
+                        actualizarLabel(0);
+                        enEjecucion = false;
+                        if (listener != null) {
+                            listener.terminado();
+                        }
+                    } else {
+                        actualizarLabel(restante);
+                    }
+                } else {
+                    actualizarLabel(transcurrido);
+                }
             }
             try {
-                Thread.sleep(500);
+                Thread.sleep(250);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
     }
 
     private void actualizarLabel(long milisegundos) {
-        long segundos = (milisegundos / 1000) % 60;
-        long minutos = (milisegundos / 1000) / 60;
-        String texto = String.format("Tiempo Workout: %02d:%02d mins", minutos, segundos);
-
-       
-        label.setText(texto);
+        long segundosTot = milisegundos / 1000;
+        long segundos = segundosTot % 60;
+        long minutos = (segundosTot / 60) % 60;
+        long horas = (segundosTot / 3600);
+        if (modoCuentaAtras) {
+            // formato mm:ss
+            String texto = String.format("%02d:%02d", minutos + horas * 60, segundos);
+            label.setText(texto);
+        } else {
+            // usar prefijo personalizado
+            if (prefijoTexto == null || prefijoTexto.trim().isEmpty()) {
+                String texto = String.format("%02d:%02d", minutos, segundos);
+                label.setText(texto);
+            } else {
+                String texto = String.format("%s %02d:%02d mins", prefijoTexto, minutos, segundos);
+                label.setText(texto);
+            }
+        }
     }
 
     public void iniciar() {
@@ -60,5 +121,26 @@ public class CronometroThread extends Thread {
 
     public boolean isEnEjecucion() {
         return enEjecucion;
+    }
+
+    // Permite reiniciar (para reutilizar hilo en modo cuenta atrás si se desea)
+    public void reiniciarCuentaAtras() {
+        tiempoInicio = System.currentTimeMillis();
+        tiempoAcumulado = 0;
+        enEjecucion = false;
+    }
+
+    // Devuelve milisegundos transcurridos o restantes según modo
+    public synchronized long obtenerMilisTranscurridos() {
+        long transcurrido = tiempoAcumulado;
+        if (enEjecucion) {
+            transcurrido += System.currentTimeMillis() - tiempoInicio;
+        }
+        if (modoCuentaAtras) {
+            long restante = duracionInicialMillis - transcurrido;
+            return Math.max(0, restante);
+        } else {
+            return transcurrido;
+        }
     }
 }
