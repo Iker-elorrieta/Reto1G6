@@ -18,6 +18,8 @@ import Modelo.Ejercicio;
 import Modelo.HiloBackup;
 import Modelo.Usuario;
 import Modelo.Workout;
+import conexion.Conexion;
+import Controlador.ControladorHistorico;
 
 public class ControladorUsuario implements ActionListener {
 
@@ -82,6 +84,16 @@ public class ControladorUsuario implements ActionListener {
         // Botón para abrir pantalla de workouts
         this.vistaMenu.getBtnEmpezar().addActionListener(this);
         this.vistaMenu.getBtnEmpezar().setActionCommand("ABRIR_WORKOUTS");
+
+        // Botón para abrir histórico
+      try {
+            if (this.vistaMenu.getBtnHistorico() != null) {
+                this.vistaMenu.getBtnHistorico().addActionListener(this);
+               this.vistaMenu.getBtnHistorico().setActionCommand("ABRIR_HISTORICO");
+            }
+        } catch (Exception ex) {
+            // ignorar si la vista no tiene el botón por alguna razón
+        }
     }
 
     private void inicializarControladorPerfil() {
@@ -169,7 +181,7 @@ public class ControladorUsuario implements ActionListener {
         this(vistaWorkouts, vistaMenu, null);
     }
 
-    @Override
+    
     public void actionPerformed(ActionEvent e) {
         final String comando = e.getActionCommand();
 
@@ -193,7 +205,17 @@ public class ControladorUsuario implements ActionListener {
             this.mCerrarSesion();
         } else if ("VOLVER_MENU".equals(comando)) {
             this.mVolverAMenu();
+        } else if ("ABRIR_HISTORICO".equals(comando)) {
+            this.mAbrirHistorico();
         }
+    }
+
+    private void mAbrirHistorico() {
+        if (this.usuarioActual == null || this.vistaMenu == null) return;
+        this.vistaMenu.setVisible(false);
+        Vista.historicowo ventana = new Vista.historicowo();
+        ventana.setVisible(true);
+        new ControladorHistorico(ventana, this.usuarioActual);
     }
 
     private void mLoginUsuario() {
@@ -207,11 +229,14 @@ public class ControladorUsuario implements ActionListener {
 
         final String emailId = email.toLowerCase();
         Usuario usuario = new Usuario();
+        // Si no hay conexión de red, notificamos y dejaremos que el método use backups.
+        if (!Conexion.hostAlcanzable(1200)) {
+            this.vistaLogin.getLblErrores().setText("Sin conexión: se usará la copia local");
+        }
         if (usuario.mAutenticarUsuario(emailId, pass)) {
 
             usuario = usuario.mObtenerUsuario(emailId);
 
-            // Sección revisada
             Vista.menu ventanaMenu = new Vista.menu();
             final String nombreParaMostrar;
             if (usuario.getNombre() != null && !usuario.getNombre().isEmpty()) {
@@ -446,7 +471,7 @@ public class ControladorUsuario implements ActionListener {
             }
 
             vistaEjercicios.getTableEjercicios().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-                @Override
+                
                 public void valueChanged(ListSelectionEvent e) {
                     int row = vistaEjercicios.getTableEjercicios().getSelectedRow();
                     if (row < 0) return;
@@ -526,7 +551,7 @@ public class ControladorUsuario implements ActionListener {
 
             // Añadimos listener para abrir entrenamiento con el workout actual
             vistaEjercicios.getBtnEmpezarWO().addActionListener(new java.awt.event.ActionListener() {
-                @Override
+                
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     try {
                         // Abrir ventana de entrenamiento
@@ -546,7 +571,7 @@ public class ControladorUsuario implements ActionListener {
 
             // Botón volver en ejercicios
             vistaEjercicios.getBtnVolver().addActionListener(new ActionListener() {
-                @Override
+                
                 public void actionPerformed(ActionEvent e) {
                     vistaEjercicios.setVisible(false);
                     vistaEjercicios.dispose();

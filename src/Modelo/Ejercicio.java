@@ -8,6 +8,7 @@ import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 
 import conexion.Conexion;
+import LecturaPB.lectura;
 
 public class Ejercicio extends Workout {
     
@@ -96,6 +97,7 @@ public class Ejercicio extends Workout {
          Firestore co = null;
          try {
              co = Conexion.conectar();
+             if (co == null) throw new Exception("Sin conexion a Firestore");
              ApiFuture<QuerySnapshot> query = co.collection("workouts")
                      .document(workoutId)
                      .collection("ejercicios")
@@ -107,7 +109,7 @@ public class Ejercicio extends Workout {
                  e.setDescripcion(doc.getString("Descripcion"));
                  e.setImagen(doc.getString("Imagen"));
 
-                 // Obtener series asociadas y calcular métricas
+                 // Obtener series asociadas y calcular 
                  ArrayList<Serie> series = new Serie().mObtenerSeries(workoutId, doc.getId());
                  double totalDuracion = 0.0;
                  double totalDesc = 0.0;
@@ -117,7 +119,7 @@ public class Ejercicio extends Workout {
                      totalDuracion += s.getDuracionMinutos();
                      totalDesc += s.getTiempo_descanso();
                      totalTserie += s.getTiempo_serie();
-                     // contar la cantidad de repeticiones/series reales según Serie.Cantidad
+                     // contar la cantidad de repeticiones/series reales 
                      totalCantSeries += s.getCantidad();
                  }
                  // Ahora usamos la suma de 'Cantidad' para seriesCount
@@ -135,8 +137,48 @@ public class Ejercicio extends Workout {
              }
              co.close();
          } catch (Exception ex) {
-             System.out.println("Error Obtener Ejercicios");
-             ex.printStackTrace();
+             // leer desde backups
+             try {
+                ArrayList<WorkoutCompleto> backups = new lectura().leerWorkoutsDesdeBackup();
+                 for (WorkoutCompleto wc : backups) {
+                     if (wc == null || wc.getWorkout() == null) continue;
+                     if (!wc.getWorkout().getNombre().equals(workoutId)) continue;
+                     if (wc.getEjercicios() == null) continue;
+                     for (EjercicioConSeries ecs : wc.getEjercicios()) {
+                         Ejercicio e = new Ejercicio();
+                         e.setNombre(ecs.getNombre());
+                         e.setDescripcion(ecs.getDescripcion());
+                         e.setImagen(ecs.getImagen());
+
+                         double totalDuracion = 0.0;
+                         double totalDesc = 0.0;
+                         double totalTserie = 0.0;
+                         int totalCantSeries = 0;
+                         ArrayList<Serie> series = ecs.getSeries();
+                         if (series != null) {
+                             for (Serie s : series) {
+                                 totalDuracion += s.getDuracionMinutos();
+                                 totalDesc += s.getTiempo_descanso();
+                                 totalTserie += s.getTiempo_serie();
+                                 totalCantSeries += s.getCantidad();
+                             }
+                         }
+                         e.setSeriesCount(totalCantSeries);
+                         e.setDuracionMinutos(totalDuracion);
+                         if (series != null && series.size() > 0) {
+                             e.setAvgTiempoDescanso(totalDesc / series.size());
+                             e.setAvgTiempoSerie(totalTserie / series.size());
+                         } else {
+                             e.setAvgTiempoDescanso(0);
+                             e.setAvgTiempoSerie(0);
+                         }
+                         lista.add(e);
+                     }
+                 }
+             } catch (Exception e2) {
+                 System.out.println("Error Obtener Ejercicios (fallback)");
+                 e2.printStackTrace();
+             }
          }
          return lista;
      }

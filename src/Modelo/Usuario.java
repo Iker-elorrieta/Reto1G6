@@ -17,6 +17,7 @@ import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 
 import conexion.Conexion;
+import LecturaPB.lectura;
 
 public class Usuario implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -30,7 +31,6 @@ public class Usuario implements Serializable {
 	private double nivel;
 	private String tipoUsuario;
 
-	// Convertir constantes de clase a final de instancia para evitar static innecesario
 	private final String collectionName = "usuarios";
 	private final String fieldNombre = "nombre";
 	private final String fieldApellidos = "apellidos";
@@ -121,6 +121,7 @@ public class Usuario implements Serializable {
 
 		try {
 			co = Conexion.conectar();
+			if (co == null) throw new Exception("Sin conexion a Firestore");
 			DocumentSnapshot usuario = co.collection(collectionName).document(idUsuario).get().get();
 
 			if (usuario.exists()) {
@@ -147,8 +148,17 @@ public class Usuario implements Serializable {
 			co.close();
 
 		} catch (Exception e) {
-			System.out.println("Error: Clase Usuario");
-			e.printStackTrace();
+			// buscar en backups
+			try {
+				ArrayList<Usuario> lista = new lectura().leerUsuariosDesdeBackup();
+				for (Usuario u : lista) {
+					if (u.getEmail() != null && u.getEmail().equals(idUsuario)) {
+						return u;
+					}
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 
 		return this;
@@ -160,6 +170,7 @@ public class Usuario implements Serializable {
 
 		try {
 			co = Conexion.conectar();
+			if (co == null) throw new Exception("Sin conexion a Firestore");
 			ApiFuture<QuerySnapshot> query = co.collection(collectionName).get();
 			QuerySnapshot querySnapshot = query.get();
 			List<QueryDocumentSnapshot> usuarios = querySnapshot.getDocuments();
@@ -176,7 +187,7 @@ public class Usuario implements Serializable {
 
 				if (valor == null) {
 				    nivelObj = 0.0; 
-				}	else if (valor instanceof Number) {
+				} 	else if (valor instanceof Number) {
 					nivelObj = ((Number) valor).doubleValue();
 				} else {
 					nivelObj = Double.parseDouble((String) valor);
@@ -192,7 +203,12 @@ public class Usuario implements Serializable {
 				} else if (valorTipo instanceof String) {
 				    tipoUsuario = ((String) valorTipo).trim();
 				} else if (valorTipo instanceof Boolean) {
-				    tipoUsuario = (Boolean) valorTipo ? "true" : "false";
+					Boolean b = (Boolean) valorTipo;
+					if (b.booleanValue()) {
+						tipoUsuario = "true";
+					} else {
+						tipoUsuario = "false";
+					}
 				}
 
 				u.setTipoUsuario(tipoUsuario);
@@ -207,6 +223,13 @@ public class Usuario implements Serializable {
 			co.close();
 
 		} catch (Exception e) {
+			// leer usuarios desde backups
+			try {
+				ArrayList<Usuario> lista = new lectura().leerUsuariosDesdeBackup();
+				if (lista != null) return lista;
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 			System.out.println("Error: Clase Usuarios");
 			e.printStackTrace();
 		}
@@ -220,7 +243,12 @@ public class Usuario implements Serializable {
 		try {
 			co = Conexion.conectar();
 			// Normalizar email a usar como id
-			String emailId = (this.email != null) ? this.email.trim().toLowerCase() : null;
+			String emailId;
+			if (this.email != null) {
+				emailId = this.email.trim().toLowerCase();
+			} else {
+				emailId = null;
+			}
 			if (emailId == null || emailId.isEmpty()) {
 				throw new IOException("Email inválido para crear usuario.");
 			}
@@ -260,7 +288,13 @@ public class Usuario implements Serializable {
 
 		try {
 			co = Conexion.conectar();
-			String emailId = (email != null) ? email.trim().toLowerCase() : null;
+			if (co == null) throw new Exception("Sin conexion a Firestore");
+			String emailId;
+			if (email != null) {
+				emailId = email.trim().toLowerCase();
+			} else {
+				emailId = null;
+			}
 			if (emailId == null || emailId.isEmpty()) {
 				return false;
 			}
@@ -276,19 +310,42 @@ public class Usuario implements Serializable {
 			co.close();
 
 		} catch (Exception e) {
+			//  autenticar con backups
+			try {
+				ArrayList<Usuario> lista = new lectura().leerUsuariosDesdeBackup();
+				String emailId;
+				if (email != null) {
+					emailId = email.trim().toLowerCase();
+				} else {
+					emailId = null;
+				}
+				if (emailId == null) return false;
+				for (Usuario u : lista) {
+					if (u.getEmail() != null && u.getEmail().equals(emailId)) {
+						if (u.getPass() != null && u.getPass().equals(pass)) return true;
+					}
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 			System.out.println("Error: Clase Usuario");
 			e.printStackTrace();
 		}
 		return false;
 	}
 
-	// Nuevo método: actualizar los datos del usuario existente en Firestore
+	// actualizar los datos del usuario existente en Firestore
 	public boolean mActualizarUsuario() {
 		Firestore co = null;
 
 		try {
 			co = Conexion.conectar();
-			String emailId = (this.email != null) ? this.email.trim().toLowerCase() : null;
+			String emailId;
+			if (this.email != null) {
+				emailId = this.email.trim().toLowerCase();
+			} else {
+				emailId = null;
+			}
 			if (emailId == null || emailId.isEmpty()) {
 				throw new IOException("Email inválido para actualizar usuario.");
 			}

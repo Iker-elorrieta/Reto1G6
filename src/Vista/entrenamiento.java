@@ -217,6 +217,8 @@ public class entrenamiento extends JFrame {
         }
         this.lblDescripcionEjercicio.setText("Descripción: " + texto);
     }
+    
+    // lo de la imagen no esta en rubricas pero lo añado yo para que se vea mejor (esta hecho con ia)
     public void setImagenEjercicio(String img) {
         java.awt.Image orig = null;
         try {

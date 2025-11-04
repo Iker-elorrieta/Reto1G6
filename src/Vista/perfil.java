@@ -18,9 +18,13 @@ import Modelo.Usuario;
 import java.text.SimpleDateFormat;
 
 
-@SuppressWarnings("serial")//esto es automatico para quitar el warning
+
 public class perfil extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField txtNombre;
 	private JTextField txtApellidos; 
@@ -30,7 +34,6 @@ public class perfil extends JFrame {
 	private JButton btnVolver;
 	private JLabel lblErrores;
 
-	// UI constants
 	private final String IMG_LOGO_PATH = "media/logo1.png";
 	private final String TXT_TITULO = "Tu Perfil";
 	private final String TXT_NOMBRE = "Nombre:";

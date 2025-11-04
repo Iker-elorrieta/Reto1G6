@@ -26,7 +26,7 @@ public class ejercicios extends JFrame {
 	private JLabel lblImg;
 	private JButton btnEmpezarWO;
 
-	// UI constants
+	
 	private final String IMG_LOGO_PATH = "media/logo1.png";
 	private final String TXT_TITULO = "EJERCICIOS";
 	private final String BTN_VOLVER = "Volver";

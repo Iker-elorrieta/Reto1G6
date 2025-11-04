@@ -24,7 +24,7 @@ public class login extends JFrame {
 	private JButton btnRegistrar;
 	private JLabel lblErrores;
 
-	// UI text constants
+
 	private final String IMG_LOGO_PATH = "media/logo1.png";
 	private final String TXT_TITULO = "Iniciar Sesión";
 	private final String TXT_EMAIL = "Email:";

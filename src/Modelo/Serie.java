@@ -8,6 +8,7 @@ import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 
 import conexion.Conexion;
+import LecturaPB.lectura;
 
 public class Serie extends Ejercicio {
     
@@ -84,6 +85,7 @@ public class Serie extends Ejercicio {
          Firestore co = null;
          try {
              co = Conexion.conectar();
+             if (co == null) throw new Exception("Sin conexion a Firestore");
              ApiFuture<QuerySnapshot> query = co.collection("workouts")
                      .document(workoutId)
                      .collection("ejercicios")
@@ -104,8 +106,27 @@ public class Serie extends Ejercicio {
              }
              co.close();
          } catch (Exception e) {
-             System.out.println("Error mObtenerSeries");
-             e.printStackTrace();
+             //leer desde backups
+             try {
+                ArrayList<WorkoutCompleto> backups = new lectura().leerWorkoutsDesdeBackup();
+                 for (WorkoutCompleto wc : backups) {
+                     if (wc == null || wc.getWorkout() == null) continue;
+                     if (!wc.getWorkout().getNombre().equals(workoutId)) continue;
+                     if (wc.getEjercicios() == null) continue;
+                     for (EjercicioConSeries ecs : wc.getEjercicios()) {
+                         if (!ecs.getNombre().equals(ejercicioId)) continue;
+                         ArrayList<Serie> series = ecs.getSeries();
+                         if (series != null) {
+                             for (Serie s : series) {
+                                 lista.add(s);
+                             }
+                         }
+                     }
+                 }
+             } catch (Exception ex) {
+                 System.out.println("Error mObtenerSeries (fallback)");
+                 ex.printStackTrace();
+             }
          }
          return lista;
      }

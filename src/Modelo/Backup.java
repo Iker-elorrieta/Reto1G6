@@ -33,10 +33,10 @@ public class Backup {
     }
 
     public void guardarUsuarios(ArrayList<Usuario> usuarios) {
-        lectura.guardarUsuarios(usuarios);
+        new lectura().guardarUsuarios(usuarios);
     }
 
     public void guardarWorkouts(ArrayList<Workout> workouts) {
-        lectura.guardarWorkouts(workouts);
+        new lectura().guardarWorkouts(workouts);
     }
 }

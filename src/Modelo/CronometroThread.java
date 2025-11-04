@@ -29,7 +29,7 @@ public class CronometroThread extends Thread {
         this(label, 0, "Tiempo Workout:");
     }
 
-    // Constructor con prefijo para modo stopwatch
+    
     public CronometroThread(JLabel label, String prefijo) {
         this(label, 0, prefijo);
     }
@@ -43,7 +43,7 @@ public class CronometroThread extends Thread {
         this.label = label;
         this.duracionInicialMillis = duracionInicialMillis;
         this.modoCuentaAtras = duracionInicialMillis > 0;
-        // Evitar operador ternario: asignación simple
+       
         if (prefijo == null) {
             this.prefijoTexto = "";
         } else {
@@ -129,19 +129,19 @@ public class CronometroThread extends Thread {
         detenido = true;
     }
 
-    // Renombrado para evitar prefijo "is" en nombre de método
+   
     public boolean estaEnEjecucion() {
         return enEjecucion;
     }
 
-    // Permite reiniciar (para reutilizar hilo en modo cuenta atrás si se desea)
+    // Permite reiniciar 
     public void reiniciarCuentaAtras() {
         tiempoInicio = System.currentTimeMillis();
         tiempoAcumulado = 0;
         enEjecucion = false;
     }
 
-    // Devuelve milisegundos transcurridos o restantes según modo
+    // Devuelve milisegundos transcurridos
     public synchronized long obtenerMilisTranscurridos() {
         long transcurrido = tiempoAcumulado;
         if (enEjecucion) {

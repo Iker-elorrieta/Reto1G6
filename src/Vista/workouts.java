@@ -24,12 +24,11 @@ public class workouts extends JFrame {
 	private JButton btnVolver;
 	private JTable tableWorkouts;
 
-	// UI constants
+
 	private final String IMG_LOGO_PATH = "media/logo1.png";
 	private final String TXT_TITULO = "WORKOUTS";
 	private final String BTN_VOLVER_TXT = "Volver";
 	private final String[] TABLE_HEADERS = new String[] { "Nombre", "Nivel", "Duración", "Video" };
-
 	/**
 	 * Launch the application.
 	 */

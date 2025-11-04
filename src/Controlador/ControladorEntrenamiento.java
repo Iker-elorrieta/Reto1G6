@@ -301,7 +301,7 @@ public class ControladorEntrenamiento {
                 final int restantesFinal = restantes;
                 final int[] descansosRestantes = new int[] { restantesFinal };
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override
+                    
                     public void run() {
                         vista.setSeriesRestantes(restantesFinal);
                         vista.setDescansosRestantes(descansosRestantes[0]);
@@ -322,7 +322,7 @@ public class ControladorEntrenamiento {
                 }
                 final int[] tiempoRestanteEjercicio = new int[] { tiempoTotalEjercicioSegs };
                 SwingUtilities.invokeLater(new Runnable() {
-                    @Override
+                    
                     public void run() {
                         vista.setTextoTiempoEjercicio("Tiempo ejercicio: 00:00 mins");
                     }
@@ -357,14 +357,14 @@ public class ControladorEntrenamiento {
                             restantes--;
                             final int rem = restantes;
                             SwingUtilities.invokeLater(new Runnable() {
-                                @Override
+                                
                                 public void run() {
                                     vista.setSeriesRestantes(rem);
                                 }
                             });
 
                             SwingUtilities.invokeLater(new Runnable() {
-                                @Override
+                                
                                 public void run() {
                                     vista.setTextoTiempoSerie(formatSegundos(tiempoSerieSegs));
                                 }
@@ -376,7 +376,7 @@ public class ControladorEntrenamiento {
                             CronometroThread cronoSerie = new CronometroThread(vista.getLblTSerie(), tiempoSerieSegs * 1000L);
                             cronoActual = cronoSerie;
                             cronoSerie.setListener(new CronometroThread.CronometroListener() {
-                                @Override
+                                
                                 public void terminado() {
                                     synchronized (monitor) {
                                         terminado[0] = true;
@@ -413,7 +413,7 @@ public class ControladorEntrenamiento {
 
                             tiempoRestanteEjercicio[0] -= tiempoSerieSegs;
                             SwingUtilities.invokeLater(new Runnable() {
-                                @Override
+                                
                                 public void run() {
                                     vista.setTextoTiempoSerie("00:00");
                                 }
@@ -425,7 +425,7 @@ public class ControladorEntrenamiento {
                                 CronometroThread cronoDesc = new CronometroThread(vista.getLblTDescanso(), tiempoDescSegs * 1000L);
                                 cronoActual = cronoDesc;
                                 cronoDesc.setListener(new CronometroThread.CronometroListener() {
-                                    @Override
+                                    
                                     public void terminado() {
                                         synchronized (monitorDesc) {
                                             terminadoDesc[0] = true;
@@ -461,7 +461,7 @@ public class ControladorEntrenamiento {
                                 descansosRestantes[0] = Math.max(0, descansosRestantes[0] - 1);
                                 final int cr = descansosRestantes[0];
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
+                                    
                                     public void run() {
                                         vista.setDescansosRestantes(cr);
                                     }
@@ -469,7 +469,7 @@ public class ControladorEntrenamiento {
                                 tiempoRestanteEjercicio[0] -= tiempoDescSegs;
                             } else {
                                 SwingUtilities.invokeLater(new Runnable() {
-                                    @Override
+                                    
                                     public void run() {
                                         vista.setDescansosRestantes(Math.max(0, descansosRestantes[0] - 1));
                                     }

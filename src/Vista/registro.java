@@ -27,7 +27,7 @@ public class registro extends JFrame {
 	private JButton btnVolver;
 	private JLabel lblErrores;
 
-	// UI constants
+
 	private final String IMG_LOGO_PATH = "media/logo1.png";
 	private final String TXT_REGISTRARSE = "Registrarse";
 	private final String TXT_NOMBRE = "Nombre:";

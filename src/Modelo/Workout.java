@@ -9,6 +9,7 @@ import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 
 import conexion.Conexion;
+import LecturaPB.lectura;
 
 public class Workout implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
@@ -77,7 +78,11 @@ public class Workout implements java.io.Serializable {
     public List<Workout> mObtenerWorkouts() {
         final List<Workout> lista = new ArrayList<>();
 
-        try (final Firestore co = Conexion.conectar()) {
+        Firestore co = null;
+        try {
+            co = Conexion.conectar();
+            if (co == null) throw new Exception("Sin conexion a Firestore");
+
             final ApiFuture<QuerySnapshot> query = co.collection(collectionName).get();
             final QuerySnapshot querySnapshot = query.get();
 
@@ -115,9 +120,29 @@ public class Workout implements java.io.Serializable {
                 lista.add(w);
             }
 
+            co.close();
+
         } catch (final Exception e) {
-            System.out.println("Error: Clase Workouts - mObtenerWorkouts");
-            e.printStackTrace();
+            // Fallback: cargar desde backups si hay error
+            try {
+                ArrayList<WorkoutCompleto> backups = new lectura().leerWorkoutsDesdeBackup();
+                for (WorkoutCompleto wc : backups) {
+                    if (wc == null || wc.getWorkout() == null) continue;
+                    Workout w = wc.getWorkout();
+                    // recalcular duracion usando ejercicios del backup
+                    double durTotal = 0.0;
+                    if (wc.getEjercicios() != null) {
+                        for (EjercicioConSeries ecs : wc.getEjercicios()) {
+                            if (ecs != null) durTotal += ecs.getDuracionMinutos();
+                        }
+                    }
+                    w.setDuracionMinutos(durTotal);
+                    lista.add(w);
+                }
+            } catch (Exception ex) {
+                System.out.println("Error: Clase Workouts - mObtenerWorkouts (fallback)");
+                ex.printStackTrace();
+            }
         }
 
         return lista;
@@ -126,7 +151,11 @@ public class Workout implements java.io.Serializable {
     public List<Workout> obtenerWorkouts(final Long nivelUsuario) {
         final List<Workout> lista = new ArrayList<>();
 
-        try (final Firestore co = Conexion.conectar()) {
+        Firestore co = null;
+        try {
+            co = Conexion.conectar();
+            if (co == null) throw new Exception("Sin conexion a Firestore");
+
             final ApiFuture<QuerySnapshot> query;
 
             if (nivelUsuario != null) {
@@ -158,7 +187,7 @@ public class Workout implements java.io.Serializable {
                 }
                 w.setOwner(ownerStr);
 
-                // Calcular duración sumando ejercicios relacionados a este workout
+                // Calcular duración sumando ejercicios 
                 double durTotal = 0.0;
                 try {
                     final List<Ejercicio> ejercs = new Ejercicio().mObtenerEjercicios(doc.getId());
@@ -173,8 +202,28 @@ public class Workout implements java.io.Serializable {
                 lista.add(w);
             }
 
+            co.close();
+
         } catch (final Exception e) {
-            e.printStackTrace();
+            // cargar desde backups
+            try {
+                ArrayList<WorkoutCompleto> backups = new lectura().leerWorkoutsDesdeBackup();
+                for (WorkoutCompleto wc : backups) {
+                    if (wc == null || wc.getWorkout() == null) continue;
+                    Workout w = wc.getWorkout();
+                    if (nivelUsuario != null && w.getNivel() > nivelUsuario) continue;
+                    double durTotal = 0.0;
+                    if (wc.getEjercicios() != null) {
+                        for (EjercicioConSeries ecs : wc.getEjercicios()) {
+                            if (ecs != null) durTotal += ecs.getDuracionMinutos();
+                        }
+                    }
+                    w.setDuracionMinutos(durTotal);
+                    lista.add(w);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
 
         return lista;

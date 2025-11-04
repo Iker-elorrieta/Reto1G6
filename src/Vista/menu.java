@@ -23,8 +23,9 @@ public class menu extends JFrame {
 	private JLabel lblbienvenido; 
 	private JLabel lblNivel; 
 	private JButton btnEmpezar;
+	private JButton btnHistorico;
 
-	// UI constants
+	
 	private final String IMG_LOGO_PATH = "media/logo1.png";
 	private final String TXT_MENU = "Menú";
 	private final String TXT_BIEN = "Bienvenido, ";
@@ -108,7 +109,7 @@ public class menu extends JFrame {
 		btnEmpezar.setBounds(324, 218, 237, 41);
 		contentPane.add(btnEmpezar);
 		
-		JButton btnHistorico = new JButton(BTN_HISTORICO);
+		btnHistorico = new JButton(BTN_HISTORICO);
 		btnHistorico.setForeground(new Color(240, 248, 255));
 		btnHistorico.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnHistorico.setBackground(new Color(139, 0, 0));
@@ -145,6 +146,7 @@ public class menu extends JFrame {
 	public JButton getBtnPerfil() { return btnPerfil; }
 	public JButton getBtnEmpezar() { return btnEmpezar; }
 	public JButton getBtnCerrarSesion() { return btnCerrarSesion; }
+	public JButton getBtnHistorico() { return btnHistorico; }
 	public JLabel getLblbienvenido() { return lblbienvenido; }
 	public JLabel getLblNivel() { return lblNivel; }
 }
