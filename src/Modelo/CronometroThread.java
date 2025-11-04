@@ -43,7 +43,12 @@ public class CronometroThread extends Thread {
         this.label = label;
         this.duracionInicialMillis = duracionInicialMillis;
         this.modoCuentaAtras = duracionInicialMillis > 0;
-        this.prefijoTexto = (prefijo == null) ? "" : prefijo;
+        // Evitar operador ternario: asignación simple
+        if (prefijo == null) {
+            this.prefijoTexto = "";
+        } else {
+            this.prefijoTexto = prefijo;
+        }
     }
 
     public void setListener(CronometroListener l) {
@@ -115,11 +120,17 @@ public class CronometroThread extends Thread {
     }
 
     public void detener() {
+        // Asegurar que acumulamos el tiempo en curso antes de detener
+        if (enEjecucion) {
+            long ahora = System.currentTimeMillis();
+            tiempoAcumulado += (ahora - tiempoInicio);
+        }
         enEjecucion = false;
         detenido = true;
     }
 
-    public boolean isEnEjecucion() {
+    // Renombrado para evitar prefijo "is" en nombre de método
+    public boolean estaEnEjecucion() {
         return enEjecucion;
     }
 

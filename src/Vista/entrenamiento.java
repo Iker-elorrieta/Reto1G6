@@ -9,7 +9,7 @@ public class entrenamiento extends JFrame {
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
 
-    // Componentes accesibles desde el controlador (campos de instancia)
+ 
     private JLabel lblTWorkout;
     private JLabel lblTEjercicio;
     private JLabel lblTSerie;
@@ -70,8 +70,8 @@ public class entrenamiento extends JFrame {
         contentPane.add(panel);
         panel.setLayout(null);
 
-        // Usar campos de instancia en lugar de variables locales
-        lblTWorkout = new JLabel("Tiempo Workout: 00:00 mins");
+   
+        lblTWorkout = new JLabel("Tiempo total: 00:00 mins");
         lblTWorkout.setForeground(Color.WHITE);
         lblTWorkout.setBounds(0, 0, 174, 53);
         panel.add(lblTWorkout);
@@ -79,7 +79,7 @@ public class entrenamiento extends JFrame {
         btnTerminar = new JButton("Terminar");
         btnTerminar.setBackground(new Color(139, 0, 0));
         btnTerminar.setForeground(Color.BLACK);
-        btnTerminar.setBounds(529, 466, 90, 53);
+        btnTerminar.setBounds(530, 528, 90, 53);
         contentPane.add(btnTerminar);
 
         JPanel panel_1 = new JPanel();
@@ -110,7 +110,7 @@ public class entrenamiento extends JFrame {
         panel_2.setBounds(734, 187, 174, 53);
         contentPane.add(panel_2);
 
-        lblNombreWorkout = new JLabel("Workout:");
+        lblNombreWorkout = new JLabel("Entrenamiento:");
         lblNombreWorkout.setForeground(Color.WHITE);
         lblNombreWorkout.setBounds(0, 0, 174, 53);
         panel_2.add(lblNombreWorkout);
@@ -118,19 +118,19 @@ public class entrenamiento extends JFrame {
         JPanel panel_5 = new JPanel();
         panel_5.setLayout(null);
         panel_5.setBackground(new Color(139, 0, 0));
-        panel_5.setBounds(734, 315, 174, 117);
+        panel_5.setBounds(231, 187, 458, 53);
         contentPane.add(panel_5);
-
-        lblDescripcionEjercicio = new JLabel("Descripción:");
-        lblDescripcionEjercicio.setVerticalAlignment(SwingConstants.TOP);
-        lblDescripcionEjercicio.setForeground(Color.WHITE);
-        lblDescripcionEjercicio.setBounds(0, 0, 174, 117);
-        panel_5.add(lblDescripcionEjercicio);
+        
+                lblDescripcionEjercicio = new JLabel("Descripción:");
+                lblDescripcionEjercicio.setVerticalAlignment(SwingConstants.TOP);
+                lblDescripcionEjercicio.setBounds(0, 0, 458, 53);
+                panel_5.add(lblDescripcionEjercicio);
+                lblDescripcionEjercicio.setForeground(Color.WHITE);
 
         JPanel panel_5_1 = new JPanel();
         panel_5_1.setLayout(null);
         panel_5_1.setBackground(new Color(139, 0, 0));
-        panel_5_1.setBounds(232, 187, 217, 245);
+        panel_5_1.setBounds(231, 251, 217, 245);
         contentPane.add(panel_5_1);
 
         JLabel lbl1 = new JLabel("TIEMPO SERIE");
@@ -142,7 +142,7 @@ public class entrenamiento extends JFrame {
         lblTSerie = new JLabel("00:00");
         lblTSerie.setForeground(Color.WHITE);
         lblTSerie.setFont(new Font("Tahoma", Font.BOLD, 49));
-        lblTSerie.setBounds(38, 56, 144, 119);
+        lblTSerie.setBounds(38, 51, 144, 119);
         panel_5_1.add(lblTSerie);
 
         lblNumSeriesRestantes = new JLabel("Series restantes: 0");
@@ -154,7 +154,7 @@ public class entrenamiento extends JFrame {
         JPanel panel_5_1_1 = new JPanel();
         panel_5_1_1.setLayout(null);
         panel_5_1_1.setBackground(new Color(139, 0, 0));
-        panel_5_1_1.setBounds(471, 187, 217, 245);
+        panel_5_1_1.setBounds(472, 251, 217, 245);
         contentPane.add(panel_5_1_1);
 
         JLabel lbl2 = new JLabel("  TIEMPO DESCANSO");
@@ -178,14 +178,14 @@ public class entrenamiento extends JFrame {
         btnPararEmpezar = new JButton("Empezar");
         btnPararEmpezar.setForeground(Color.BLACK);
         btnPararEmpezar.setBackground(new Color(139, 0, 0));
-        btnPararEmpezar.setBounds(291, 466, 90, 53);
+        btnPararEmpezar.setBounds(291, 528, 90, 53);
         contentPane.add(btnPararEmpezar);
 
         lblImagenEjercicio = new JLabel("");
         lblImagenEjercicio.setBounds(10, 315, 174, 117);
         contentPane.add(lblImagenEjercicio);
 
-        // La lógica de hilos la gestiona el controlador específico
+   
     }
 
     public JButton getBtnTerminar() { return btnTerminar; }
@@ -195,10 +195,28 @@ public class entrenamiento extends JFrame {
     public JLabel getLblTDescanso() { return lblTDescanso; }
     public JLabel getLblTEjercicio() { return lblTEjercicio; }
 
-    // Métodos adicionales usados por controladores
-    public void setNombreWorkout(String nombre) { this.lblNombreWorkout.setText("Workout: " + (nombre == null ? "" : nombre)); }
-    public void setNombreEjercicio(String nombre) { this.lblNombreEjercicio.setText("Ejercicio: " + (nombre == null ? "" : nombre)); }
-    public void setDescripcionEjercicio(String desc) { this.lblDescripcionEjercicio.setText("Descripción: " + (desc == null ? "" : desc)); }
+  
+    public void setNombreWorkout(String nombre) {
+        String texto = "";
+        if (nombre != null) {
+            texto = nombre;
+        }
+        this.lblNombreWorkout.setText("Entrenamiento: " + texto);
+    }
+    public void setNombreEjercicio(String nombre) {
+        String texto = "";
+        if (nombre != null) {
+            texto = nombre;
+        }
+        this.lblNombreEjercicio.setText("Ejercicio: " + texto);
+    }
+    public void setDescripcionEjercicio(String desc) {
+        String texto = "";
+        if (desc != null) {
+            texto = desc;
+        }
+        this.lblDescripcionEjercicio.setText("Descripción: " + texto);
+    }
     public void setImagenEjercicio(String img) {
         java.awt.Image orig = null;
         try {
@@ -208,7 +226,7 @@ public class entrenamiento extends JFrame {
         }
         if (orig == null) {
             try {
-                // Intentar como recurso en classpath
+         
                 java.net.URL res = Controlador.ControladorEntrenamiento.class.getResource("/" + img);
                 if (res != null) orig = new javax.swing.ImageIcon(res).getImage();
             } catch (Exception ex) {
@@ -221,7 +239,7 @@ public class entrenamiento extends JFrame {
                 orig = null;
             }
         }
-        // Intentar buscar en carpeta media/ si no se encontró aún
+   
         if (orig == null && img != null && !img.isEmpty()) {
             try {
                 String mediaPath = "media/" + img;

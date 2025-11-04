@@ -6,10 +6,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 
 import Modelo.CronometroThread;
@@ -29,19 +30,26 @@ public class ControladorEntrenamiento {
     private final Usuario usuario;
     private final workouts vistaWorkoutsPrev;
     private final ejercicios vistaEjerciciosPrev;
-
-    private volatile boolean stopRequested = false;
-    private volatile CountDownLatch espera = null;
+    private boolean detenerSolicitado = false;
 
     private CronometroThread cronoWorkout = null;
-    private volatile CronometroThread currentCrono = null; // cronómetro activo (serie o descanso)
-    private volatile CronometroThread cronoEjercicio = null; // cronómetro progresivo por ejercicio
+    private CronometroThread cronoActual = null; // cronómetro activo (serie o descanso)
+    private CronometroThread cronoPorEjercicio = null; // cronómetro progresivo por ejercicio
     private Thread hiloSecuencia = null;
+
+    // Contador de ejercicios completados accesible desde listener
+    private int ejerciciosCompletados = 0;
+    // Bandera para evitar guardar histórico más de una vez
+    private boolean historicoGuardado = false;
 
     public ControladorEntrenamiento(entrenamiento vista, List<Ejercicio> ejercicios, String workoutId, Usuario usuario,
             workouts vwPrev, ejercicios vePrev) {
         this.vista = vista;
-        this.ejercicios = (ejercicios != null) ? ejercicios : new ArrayList<Ejercicio>();
+        if (ejercicios != null) {
+            this.ejercicios = ejercicios;
+        } else {
+            this.ejercicios = new ArrayList<Ejercicio>();
+        }
         this.workoutId = workoutId;
         this.usuario = usuario;
         this.vistaWorkoutsPrev = vwPrev;
@@ -62,13 +70,15 @@ public class ControladorEntrenamiento {
         this.vista.getBtnTerminar().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                stopRequested = true;
-                // desbloquear espera si existe
-                if (espera != null) espera.countDown();
-                // detener cronómetro del workout y cronómetro actual
-                if (cronoWorkout != null) cronoWorkout.detener();
-                if (currentCrono != null) currentCrono.detener();
-                if (cronoEjercicio != null) cronoEjercicio.detener();
+                // Deshabilitar botón para evitar doble pulsación
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        try { vista.getBtnTerminar().setEnabled(false); } catch (Exception ex) {}
+                    }
+                });
+               
+                manejarTerminar();
             }
         });
 
@@ -84,45 +94,203 @@ public class ControladorEntrenamiento {
 
     private void manejarBotonEmpezarPausar() {
         if (cronoWorkout == null) return;
-        if (!cronoWorkout.isEnEjecucion()) {
+        if (!cronoWorkout.estaEnEjecucion()) {
             // reanudar general y crono actual si existe
             cronoWorkout.iniciar();
-            if (currentCrono != null) currentCrono.iniciar();
-            if (cronoEjercicio != null) cronoEjercicio.iniciar();
-            SwingUtilities.invokeLater(() -> vista.getBtnPararEmpezar().setText("Pausar"));
+            if (cronoActual != null) cronoActual.iniciar();
+            if (cronoPorEjercicio != null) cronoPorEjercicio.iniciar();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    vista.getBtnPararEmpezar().setText("Pausar");
+                }
+            });
         } else {
             // pausar general y crono actual si existe
             cronoWorkout.pausar();
-            if (currentCrono != null) currentCrono.pausar();
-            if (cronoEjercicio != null) cronoEjercicio.pausar();
-            SwingUtilities.invokeLater(() -> vista.getBtnPararEmpezar().setText("Empezar"));
+            if (cronoActual != null) cronoActual.pausar();
+            if (cronoPorEjercicio != null) cronoPorEjercicio.pausar();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    vista.getBtnPararEmpezar().setText("Empezar");
+                }
+            });
         }
     }
 
+  
+    private long parsearTiempoLabel(String texto) {
+        if (texto == null) return 0L;
+        try {
+        	// ESTOS JAVA UTIL REGEX SON PARA poner correctante el tiempo (ia)
+            java.util.regex.Pattern p3 = java.util.regex.Pattern.compile("(\\d{1,2}:\\d{2}:\\d{2})");
+            java.util.regex.Matcher m3 = p3.matcher(texto);
+            if (m3.find()) {
+                String t = m3.group(1);
+                String[] partes = t.split(":");
+                int h = Integer.parseInt(partes[0]);
+                int m = Integer.parseInt(partes[1]);
+                int s = Integer.parseInt(partes[2]);
+                return ((h * 3600) + (m * 60) + s) * 1000L;
+            }
+            java.util.regex.Pattern p2 = java.util.regex.Pattern.compile("(\\d{1,3}:\\d{2})");
+            java.util.regex.Matcher m2 = p2.matcher(texto);
+            if (m2.find()) {
+                String t = m2.group(1);
+                String[] partes = t.split(":");
+                int m = Integer.parseInt(partes[0]);
+                int s = Integer.parseInt(partes[1]);
+                return ((m * 60) + s) * 1000L;
+            }
+        } catch (Exception e) {
+          
+        }
+        return 0L;
+    }
+
+    // Al pulsar Terminar: mostrar mensaje inmediatamente y guardar en background
+    private void manejarTerminar() {
+        detenerSolicitado = true;
+        synchronized (ControladorEntrenamiento.this) {
+            ControladorEntrenamiento.this.notifyAll();
+        }
+        if (cronoWorkout != null) cronoWorkout.detener();
+        if (cronoActual != null) cronoActual.detener();
+        if (cronoPorEjercicio != null) cronoPorEjercicio.detener();
+
+        // Obtener tiempo total (buscar patrón en etiqueta si es necesario)
+        long tiempoTotalMillis = 0;
+        try {
+            if (cronoWorkout != null) {
+                tiempoTotalMillis = cronoWorkout.obtenerMilisTranscurridos();
+            }
+        } catch (Exception ex) {
+            tiempoTotalMillis = 0;
+        }
+        if (tiempoTotalMillis <= 0) {
+            try {
+                String texto = vista.getLblTWorkout().getText();
+                tiempoTotalMillis = parsearTiempoLabel(texto);
+            } catch (Exception ex) {
+                tiempoTotalMillis = 0;
+            }
+        }
+
+        // Calcular porcentaje usando suma local de ejercicios
+        double totalWorkoutSegsLocal = 0.0;
+        if (ejercicios != null) {
+            for (Ejercicio e : ejercicios) {
+                totalWorkoutSegsLocal += e.getDuracionMinutos() * 60.0;
+            }
+        }
+        double porcentajeLocal = 0.0;
+        if (totalWorkoutSegsLocal > 0) {
+            porcentajeLocal = (tiempoTotalMillis / 1000.0) / totalWorkoutSegsLocal * 100.0;
+        }
+        final int porcentajeEnteroLocal = (int) Math.round(porcentajeLocal);
+
+        
+
+      
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(null, "Felicidades, haz completado el " + porcentajeEnteroLocal + "% del workout", "Entrenamiento terminado", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+      
+        final long tiempoParaGuardar = tiempoTotalMillis;
+        final int porcentajeMostrado = porcentajeEnteroLocal;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                guardarHistorico(ejerciciosCompletados, tiempoParaGuardar);
+
+                double totalWorkoutSegsOficial = 0.0;
+                try {
+                    if (workoutId != null && !workoutId.isEmpty()) {
+                        Firestore co = Conexion.conectar();
+                        if (co != null) {
+                            try {
+                                DocumentSnapshot wd = co.collection("workouts").document(workoutId).get().get();
+                                if (wd != null && wd.exists()) {
+                                    Object val = wd.get("duracionMinutos");
+                                    if (val == null) val = wd.get("Duracion");
+                                    if (val == null) val = wd.get("duracion");
+                                    if (val instanceof Number) {
+                                        totalWorkoutSegsOficial = ((Number) val).doubleValue() * 60.0;
+                                    } else if (val instanceof String) {
+                                        try {
+                                            double dv = Double.parseDouble(((String) val).trim());
+                                            totalWorkoutSegsOficial = dv * 60.0;
+                                        } catch (Exception e) {
+                                            totalWorkoutSegsOficial = 0.0;
+                                        }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                // ignore
+                            } finally {
+                                try { co.close(); } catch (Exception ex) {}
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    totalWorkoutSegsOficial = 0.0;
+                }
+
+                if (totalWorkoutSegsOficial <= 0.0) {
+                    double suma = 0.0;
+                    if (ejercicios != null) {
+                        for (Ejercicio e : ejercicios) {
+                            suma += e.getDuracionMinutos() * 60.0;
+                        }
+                    }
+                    totalWorkoutSegsOficial = suma;
+                }
+
+                double porcentajeOficial = 0.0;
+                if (totalWorkoutSegsOficial > 0) {
+                    porcentajeOficial = (tiempoParaGuardar / 1000.0) / totalWorkoutSegsOficial * 100.0;
+                }
+                final int porcentajeEnteroOficial = (int) Math.round(porcentajeOficial);
+
+
+                if (porcentajeEnteroOficial != porcentajeMostrado) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                       
+                        public void run() {
+                            JOptionPane.showMessageDialog(null, "Actualización: tu porcentaje real completado es " + porcentajeEnteroOficial + "%", "Porcentaje actualizado", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    });
+                }
+            }
+        }, "GuardarHistorico-Background").start();
+    }
+
     private void ejecutarSecuencia() {
-        int ejerciciosCompletados = 0;
         long tiempoTotalMillis = 0;
 
         try {
-            // iniciar cronómetro general (stopwatch) pero no arrancar series hasta que el usuario pulse Empezar
             cronoWorkout = new CronometroThread(vista.getLblTWorkout());
             cronoWorkout.start();
-            // dejamos cronoWorkout sin iniciar para esperar al usuario
 
-            // recorrer ejercicios
             for (Ejercicio ej : ejercicios) {
-                if (stopRequested) break;
+                if (detenerSolicitado) { return; }
 
-                SwingUtilities.invokeLater(() -> {
-                    vista.setNombreEjercicio(ej.getNombre());
-                    vista.setDescripcionEjercicio(ej.getDescripcion());
-                    vista.setImagenEjercicio(ej.getImagen());
-                    // reset labels para nuevo ejercicio
-                    vista.setTextoTiempoSerie("00:00");
-                    vista.setTextoTiempoEjercicio("Tiempo ejercicio: 00:00 mins");
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        vista.setNombreEjercicio(ej.getNombre());
+                        vista.setDescripcionEjercicio(ej.getDescripcion());
+                        vista.setImagenEjercicio(ej.getImagen());
+                        vista.setTextoTiempoSerie("00:00");
+                        vista.setTextoTiempoEjercicio("Tiempo ejercicio: 00:00 mins");
+                    }
                 });
 
-                // obtener series reales para este ejercicio
                 List<Serie> listaSeries = new Serie().mObtenerSeries(workoutId, ej.getNombre());
                 int restantes = 0;
                 if (listaSeries != null) {
@@ -131,14 +299,15 @@ public class ControladorEntrenamiento {
                     }
                 }
                 final int restantesFinal = restantes;
-                // Inicializar contador de series y descansos (descanso obligatorio tras cada repetición)
                 final int[] descansosRestantes = new int[] { restantesFinal };
-                SwingUtilities.invokeLater(() -> {
-                    vista.setSeriesRestantes(restantesFinal);
-                    vista.setDescansosRestantes(descansosRestantes[0]);
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        vista.setSeriesRestantes(restantesFinal);
+                        vista.setDescansosRestantes(descansosRestantes[0]);
+                    }
                 });
 
-                // calcular tiempo total del ejercicio (segundos)
                 int tiempoTotalEjercicioSegs = 0;
                 if (listaSeries != null) {
                     for (Serie ss : listaSeries) {
@@ -152,162 +321,179 @@ public class ControladorEntrenamiento {
                     }
                 }
                 final int[] tiempoRestanteEjercicio = new int[] { tiempoTotalEjercicioSegs };
-                SwingUtilities.invokeLater(() -> vista.setTextoTiempoEjercicio("Tiempo ejercicio: 00:00 mins"));
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        vista.setTextoTiempoEjercicio("Tiempo ejercicio: 00:00 mins");
+                    }
+                });
 
-                // preparar y arrancar crono por ejercicio (stopwatch) — se inicia cuando el usuario pulse Empezar
-                if (cronoEjercicio != null) {
-                    cronoEjercicio.detener();
-                    cronoEjercicio = null;
+                if (cronoPorEjercicio != null) {
+                    cronoPorEjercicio.detener();
+                    cronoPorEjercicio = null;
                 }
-                cronoEjercicio = new CronometroThread(vista.getLblTEjercicio(), "Tiempo ejercicio:");
-                cronoEjercicio.start();
+                cronoPorEjercicio = new CronometroThread(vista.getLblTEjercicio(), "Tiempo ejercicio:");
+                cronoPorEjercicio.start();
 
-                // para cada serie: iterar por cantidad (repeticiones) y manejar descanso entre repeticiones
                 if (listaSeries != null) {
                     for (Serie s : listaSeries) {
-                        if (stopRequested) break;
+                        if (detenerSolicitado) { return; }
                         int cantidad = Math.max(0, s.getCantidad());
                         int tiempoSerieSegs = s.getTiempo_serie();
                         int tiempoDescSegs = s.getTiempo_descanso();
 
                         for (int rep = 0; rep < cantidad; rep++) {
-                            if (stopRequested) break;
+                            if (detenerSolicitado) { return; }
 
-                            // Antes de arrancar la serie, esperar a que el usuario pulse Empezar (cronoWorkout en ejecución)
-                            while (!stopRequested && (cronoWorkout == null || !cronoWorkout.isEnEjecucion())) {
-                                try { Thread.sleep(100); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); break; }
+                            while (!detenerSolicitado && (cronoWorkout == null || !cronoWorkout.estaEnEjecucion())) {
+                                try { Thread.sleep(100); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); return; }
                             }
-                            if (stopRequested) break;
+                            if (detenerSolicitado) { return; }
 
-                            // iniciar crono de ejercicio si no está en ejecución
-                            if (cronoEjercicio != null && !cronoEjercicio.isEnEjecucion() && cronoWorkout.isEnEjecucion()) {
-                                cronoEjercicio.iniciar();
+                            if (cronoPorEjercicio != null && !cronoPorEjercicio.estaEnEjecucion() && cronoWorkout.estaEnEjecucion()) {
+                                cronoPorEjercicio.iniciar();
                             }
 
-                            // actualizar series restantes (una menos por cada repetición)
                             restantes--;
                             final int rem = restantes;
-                            SwingUtilities.invokeLater(() -> vista.setSeriesRestantes(rem));
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    vista.setSeriesRestantes(rem);
+                                }
+                            });
 
-                            // mostrar tiempo por serie en label
-                            SwingUtilities.invokeLater(() -> vista.setTextoTiempoSerie(formatSegundos(tiempoSerieSegs)));
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    vista.setTextoTiempoSerie(formatSegundos(tiempoSerieSegs));
+                                }
+                            });
 
-                            // crono de serie (cuenta atrás)
-                            CountDownLatch latchSerie = new CountDownLatch(1);
-                            espera = latchSerie;
+                            final Object monitor = new Object();
+                            final boolean[] terminado = new boolean[] { false };
+
                             CronometroThread cronoSerie = new CronometroThread(vista.getLblTSerie(), tiempoSerieSegs * 1000L);
-                            currentCrono = cronoSerie;
+                            cronoActual = cronoSerie;
                             cronoSerie.setListener(new CronometroThread.CronometroListener() {
                                 @Override
                                 public void terminado() {
-                                    latchSerie.countDown();
+                                    synchronized (monitor) {
+                                        terminado[0] = true;
+                                        monitor.notifyAll();
+                                    }
                                 }
                             });
                             cronoSerie.start();
-                            if (cronoWorkout.isEnEjecucion()) {
+                            if (cronoWorkout.estaEnEjecucion()) {
                                 cronoSerie.iniciar();
                             } else {
-                                while (!stopRequested && !cronoWorkout.isEnEjecucion()) {
-                                    try { Thread.sleep(100); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); break; }
+                                while (!detenerSolicitado && !cronoWorkout.estaEnEjecucion()) {
+                                    try { Thread.sleep(100); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); return; }
                                 }
-                                if (!stopRequested) cronoSerie.iniciar();
+                                if (detenerSolicitado) { return; }
+                                cronoSerie.iniciar();
                             }
 
-                            // esperar fin de la repetición
-                            while (true) {
-                                if (stopRequested) {
-                                    cronoSerie.detener();
-                                    latchSerie.countDown();
-                                    break;
-                                }
-                                try {
-                                    if (latchSerie.await(250, java.util.concurrent.TimeUnit.MILLISECONDS)) break;
-                                } catch (InterruptedException ie) {
-                                    Thread.currentThread().interrupt();
-                                    break;
+                            synchronized (monitor) {
+                                while (!terminado[0] && !detenerSolicitado) {
+                                    try {
+                                        monitor.wait(250);
+                                    } catch (InterruptedException ie) {
+                                        Thread.currentThread().interrupt();
+                                        return;
+                                    }
                                 }
                             }
+
                             cronoSerie.detener();
-                            currentCrono = null;
-                            espera = null;
+                            cronoActual = null;
 
-                            if (stopRequested) break;
+                            if (detenerSolicitado) { return; }
 
-                            // restar tiempo consumido de tiempoRestanteEjercicio
                             tiempoRestanteEjercicio[0] -= tiempoSerieSegs;
-                            // resetear label de serie antes del descanso
-                            SwingUtilities.invokeLater(() -> vista.setTextoTiempoSerie("00:00"));
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    vista.setTextoTiempoSerie("00:00");
+                                }
+                            });
                             if (tiempoDescSegs > 0 && rep < (cantidad - 1)) {
-                                // iniciar descanso entre repeticiones
-                                CountDownLatch latchDesc = new CountDownLatch(1);
-                                espera = latchDesc;
+                                final Object monitorDesc = new Object();
+                                final boolean[] terminadoDesc = new boolean[] { false };
+
                                 CronometroThread cronoDesc = new CronometroThread(vista.getLblTDescanso(), tiempoDescSegs * 1000L);
-                                currentCrono = cronoDesc;
+                                cronoActual = cronoDesc;
                                 cronoDesc.setListener(new CronometroThread.CronometroListener() {
                                     @Override
                                     public void terminado() {
-                                        latchDesc.countDown();
+                                        synchronized (monitorDesc) {
+                                            terminadoDesc[0] = true;
+                                            monitorDesc.notifyAll();
+                                        }
                                     }
                                 });
                                 cronoDesc.start();
-                                if (cronoWorkout.isEnEjecucion()) {
+                                if (cronoWorkout.estaEnEjecucion()) {
                                     cronoDesc.iniciar();
                                 } else {
-                                    while (!stopRequested && !cronoWorkout.isEnEjecucion()) {
-                                        try { Thread.sleep(100); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); break; }
+                                    while (!detenerSolicitado && !cronoWorkout.estaEnEjecucion()) {
+                                        try { Thread.sleep(100); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); return; }
                                     }
-                                    if (!stopRequested) cronoDesc.iniciar();
+                                    if (detenerSolicitado) { return; }
+                                    cronoDesc.iniciar();
                                 }
 
-                                while (true) {
-                                    if (stopRequested) {
-                                        cronoDesc.detener();
-                                        latchDesc.countDown();
-                                        break;
-                                    }
-                                    try {
-                                        if (latchDesc.await(250, java.util.concurrent.TimeUnit.MILLISECONDS)) break;
-                                    } catch (InterruptedException ie) {
-                                        Thread.currentThread().interrupt();
-                                        break;
+                                synchronized (monitorDesc) {
+                                    while (!terminadoDesc[0] && !detenerSolicitado) {
+                                        try {
+                                            monitorDesc.wait(250);
+                                        } catch (InterruptedException ie) {
+                                            Thread.currentThread().interrupt();
+                                            return;
+                                        }
                                     }
                                 }
                                 cronoDesc.detener();
-                                currentCrono = null;
-                                espera = null;
+                                cronoActual = null;
 
-                                // disminuir contador de descansos restantes y actualizar UI
+                                // disminuir contador de descansos restantes y actualizar 
                                 descansosRestantes[0] = Math.max(0, descansosRestantes[0] - 1);
                                 final int cr = descansosRestantes[0];
-                                SwingUtilities.invokeLater(() -> vista.setDescansosRestantes(cr));
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        vista.setDescansosRestantes(cr);
+                                    }
+                                });
                                 tiempoRestanteEjercicio[0] -= tiempoDescSegs;
                             } else {
-                                // si no hay tiempo de descanso definido, aun así consideramos que no queda descanso
-                                SwingUtilities.invokeLater(() -> vista.setDescansosRestantes(Math.max(0, descansosRestantes[0] - 1)));
+                                SwingUtilities.invokeLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        vista.setDescansosRestantes(Math.max(0, descansosRestantes[0] - 1));
+                                    }
+                                });
                             }
-
-                            // actualizar label tiempo ejercicio
-                            // no sobreescribir el label de tiempo ejercicio: lo gestiona cronoEjercicio (stopwatch)
-                            // solo actualizamos series/descanso/serie labels en la UI
                          }
-                         if (stopRequested) break;
+                         if (detenerSolicitado) { return; }
                      }
                  }
 
-                 // ejercicio completado
-                 if (!stopRequested) ejerciciosCompletados++;
+                 if (!detenerSolicitado) ejerciciosCompletados++;
 
-                 // detener y limpiar cronoEjercicio
-                 if (cronoEjercicio != null) {
-                     cronoEjercicio.detener();
-                     cronoEjercicio = null;
+                 if (cronoPorEjercicio != null) {
+                     cronoPorEjercicio.detener();
+                     cronoPorEjercicio = null;
                  }
 
-                 // limpiar labels de serie/descanso antes del siguiente ejercicio
-                 SwingUtilities.invokeLater(() -> {
-                     vista.setTextoTiempoSerie("00:00");
-                     vista.setTextoTiempoEjercicio("Tiempo ejercicio: 00:00 mins");
-                     vista.setDescansosRestantes(0);
+                 SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        vista.setTextoTiempoSerie("00:00");
+                        vista.setTextoTiempoEjercicio("Tiempo ejercicio: 00:00 mins");
+                        vista.setDescansosRestantes(0);
+                    }
                  });
             }
 
@@ -318,23 +504,44 @@ public class ControladorEntrenamiento {
             if (cronoWorkout != null) {
                 tiempoTotalMillis = cronoWorkout.obtenerMilisTranscurridos();
                 cronoWorkout.detener();
+            } else {
+                // intentar parsear label si cronoWorkout es null
+                try {
+                    String texto = vista.getLblTWorkout().getText();
+                    if (texto != null && !texto.isEmpty()) {
+                        java.util.regex.Pattern p = java.util.regex.Pattern.compile("(\\d{1,2}:\\d{2})");
+                        java.util.regex.Matcher m = p.matcher(texto);
+                        if (m.find()) {
+                            String tiempo = m.group(1);
+                            String[] minseg = tiempo.split(":");
+                            int min = Integer.parseInt(minseg[0]);
+                            int seg = Integer.parseInt(minseg[1]);
+                            tiempoTotalMillis = (min * 60 + seg) * 1000L;
+                        }
+                    }
+                } catch (Exception e) {
+                    tiempoTotalMillis = 0;
+                }
             }
 
-            // guardar histórico en Firestore
+            // guardar histórico
             guardarHistorico(ejerciciosCompletados, tiempoTotalMillis);
 
             // volver a la vista workouts
             try {
-                SwingUtilities.invokeLater(() -> {
-                    try {
-                        if (vista != null) {
-                            vista.setVisible(false);
-                            vista.dispose();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (vista != null) {
+                                vista.setVisible(false);
+                                vista.dispose();
+                            }
+                            if (vistaWorkoutsPrev != null) vistaWorkoutsPrev.setVisible(true);
+                            if (vistaEjerciciosPrev != null) { vistaEjerciciosPrev.setVisible(false); vistaEjerciciosPrev.dispose(); }
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                        if (vistaWorkoutsPrev != null) vistaWorkoutsPrev.setVisible(true);
-                        if (vistaEjerciciosPrev != null) { vistaEjerciciosPrev.setVisible(false); vistaEjerciciosPrev.dispose(); }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
                 });
             } catch (Exception e) {
@@ -343,19 +550,26 @@ public class ControladorEntrenamiento {
         }
     }
 
-    private void guardarHistorico(int ejerciciosHechos, long tiempoMillis) {
+    // sincronizado para evitar doble guardado concurrente
+    private synchronized void guardarHistorico(int ejerciciosHechos, long tiempoMillis) {
+        if (historicoGuardado) return;
         if (usuario == null) return;
         try {
+            System.out.println("Guardar historico: ejercicios=" + ejerciciosHechos + " tiempoSegs=" + Math.round(tiempoMillis/1000.0));
             Firestore co = Conexion.conectar();
             if (co == null) return;
             Map<String,Object> doc = new HashMap<>();
-            doc.put("id_workout", workoutId == null ? "" : workoutId);
+            String idWo = "";
+            if (workoutId != null) idWo = workoutId;
+            doc.put("id_workout", idWo);
             doc.put("ejercicios_hechos", ejerciciosHechos);
             doc.put("tiempo", Math.round(tiempoMillis / 1000.0)); // guardar en segundos
             doc.put("fecha", java.time.Instant.now().toString());
 
             co.collection("usuarios").document(usuario.getEmail()).collection("historico_workouts").add(doc).get();
             co.close();
+            historicoGuardado = true;
+            System.out.println("Historico guardado OK");
         } catch (Exception e) {
             e.printStackTrace();
         }
