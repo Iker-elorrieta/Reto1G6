@@ -65,14 +65,14 @@ public class entrenamiento extends JFrame {
 
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(139, 0, 0));
-		panel.setBounds(10, 187, 174, 53);
+		panel.setBounds(10, 251, 174, 53);
 		contentPane.add(panel);
 		panel.setLayout(null);
-
-		lblTWorkout = new JLabel("Tiempo total: 00:00 mins");
-		lblTWorkout.setForeground(Color.WHITE);
-		lblTWorkout.setBounds(0, 0, 174, 53);
-		panel.add(lblTWorkout);
+		
+				lblTWorkout = new JLabel("Tiempo total: 00:00 mins");
+				lblTWorkout.setBounds(0, 0, 174, 53);
+				panel.add(lblTWorkout);
+				lblTWorkout.setForeground(Color.WHITE);
 
 		btnTerminar = new JButton("Terminar");
 		btnTerminar.setBackground(new Color(139, 0, 0));
@@ -83,47 +83,47 @@ public class entrenamiento extends JFrame {
 		JPanel panel_1 = new JPanel();
 		panel_1.setLayout(null);
 		panel_1.setBackground(new Color(139, 0, 0));
-		panel_1.setBounds(10, 251, 174, 53);
+		panel_1.setBounds(10, 315, 174, 53);
 		contentPane.add(panel_1);
-
-		lblTEjercicio = new JLabel("Tiempo Ejercicio: 00:00 mins");
-		lblTEjercicio.setForeground(Color.WHITE);
-		lblTEjercicio.setBounds(0, 0, 174, 53);
-		panel_1.add(lblTEjercicio);
+		
+				lblTEjercicio = new JLabel("Tiempo Ejercicio: 00:00 mins");
+				lblTEjercicio.setBounds(0, 0, 174, 53);
+				panel_1.add(lblTEjercicio);
+				lblTEjercicio.setForeground(Color.WHITE);
 
 		JPanel panel_3 = new JPanel();
 		panel_3.setLayout(null);
 		panel_3.setBackground(new Color(139, 0, 0));
-		panel_3.setBounds(734, 251, 174, 53);
+		panel_3.setBounds(734, 315, 174, 53);
 		contentPane.add(panel_3);
-
-		lblNombreEjercicio = new JLabel("Ejercicio:");
-		lblNombreEjercicio.setForeground(Color.WHITE);
-		lblNombreEjercicio.setBounds(0, 0, 174, 53);
-		panel_3.add(lblNombreEjercicio);
+		
+				lblNombreEjercicio = new JLabel("Ejercicio:");
+				lblNombreEjercicio.setBounds(0, 0, 174, 53);
+				panel_3.add(lblNombreEjercicio);
+				lblNombreEjercicio.setForeground(Color.WHITE);
 
 		JPanel panel_2 = new JPanel();
 		panel_2.setLayout(null);
 		panel_2.setBackground(new Color(139, 0, 0));
-		panel_2.setBounds(734, 187, 174, 53);
+		panel_2.setBounds(734, 251, 174, 53);
 		contentPane.add(panel_2);
-
-		lblNombreWorkout = new JLabel("Entrenamiento:");
-		lblNombreWorkout.setForeground(Color.WHITE);
-		lblNombreWorkout.setBounds(0, 0, 174, 53);
-		panel_2.add(lblNombreWorkout);
+		
+				lblNombreWorkout = new JLabel("Entrenamiento:");
+				lblNombreWorkout.setBounds(0, 0, 174, 53);
+				panel_2.add(lblNombreWorkout);
+				lblNombreWorkout.setForeground(Color.WHITE);
 
 		JPanel panel_5 = new JPanel();
 		panel_5.setLayout(null);
 		panel_5.setBackground(new Color(139, 0, 0));
-		panel_5.setBounds(231, 187, 458, 53);
+		panel_5.setBounds(10, 187, 898, 53);
 		contentPane.add(panel_5);
-
-		lblDescripcionEjercicio = new JLabel("Descripción:");
-		lblDescripcionEjercicio.setVerticalAlignment(SwingConstants.TOP);
-		lblDescripcionEjercicio.setBounds(0, 0, 458, 53);
-		panel_5.add(lblDescripcionEjercicio);
-		lblDescripcionEjercicio.setForeground(Color.WHITE);
+		
+				lblDescripcionEjercicio = new JLabel("Descripción:");
+				lblDescripcionEjercicio.setBounds(0, 11, 898, 42);
+				panel_5.add(lblDescripcionEjercicio);
+				lblDescripcionEjercicio.setVerticalAlignment(SwingConstants.TOP);
+				lblDescripcionEjercicio.setForeground(Color.WHITE);
 
 		JPanel panel_5_1 = new JPanel();
 		panel_5_1.setLayout(null);
@@ -180,7 +180,7 @@ public class entrenamiento extends JFrame {
 		contentPane.add(btnPararEmpezar);
 
 		lblImagenEjercicio = new JLabel("");
-		lblImagenEjercicio.setBounds(10, 315, 174, 117);
+		lblImagenEjercicio.setBounds(10, 379, 174, 117);
 		contentPane.add(lblImagenEjercicio);
 
 	}
