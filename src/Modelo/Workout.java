@@ -9,174 +9,230 @@ import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 
 import conexion.Conexion;
+import LecturaPB.lectura;
 
 public class Workout implements java.io.Serializable {
-    private static final long serialVersionUID = 1L;
-    private final String collectionName = "workouts";
+	private static final long serialVersionUID = 1L;
+	private final String collectionName = "workouts";
 
-    private String Nombre; // será usado como id
-    private String Descripcion;
-    private String Video;
-    private int Nivel;
-    private String owner; // campo opcional para indicar propietario
+	private String Nombre; // será usado como id
+	private String Descripcion;
+	private String Video;
+	private int Nivel;
+	private String owner; // campo opcional para indicar propietario
 
-    // campo calculado
-    private double duracionMinutos;
+	// campo calculado
+	private double duracionMinutos;
 
-    public Workout() {}
+	public Workout() {
+	}
 
-    public String getNombre() {
-        return Nombre;
-    }
+	public String getNombre() {
+		return Nombre;
+	}
 
-    public void setNombre(String nombre) {
-        Nombre = nombre;
-    }
+	public void setNombre(String nombre) {
+		Nombre = nombre;
+	}
 
-    public String getDescripcion() {
-        return Descripcion;
-    }
+	public String getDescripcion() {
+		return Descripcion;
+	}
 
-    public void setDescripcion(String descripcion) {
-        Descripcion = descripcion;
-    }
+	public void setDescripcion(String descripcion) {
+		Descripcion = descripcion;
+	}
 
-    public String getVideo() {
-        return Video;
-    }
+	public String getVideo() {
+		return Video;
+	}
 
-    public void setVideo(String video) {
-        Video = video;
-    }
+	public void setVideo(String video) {
+		Video = video;
+	}
 
-    public int getNivel() {
-        return Nivel;
-    }
+	public int getNivel() {
+		return Nivel;
+	}
 
-    public void setNivel(int nivel) {
-        Nivel = nivel;
-    }
+	public void setNivel(int nivel) {
+		Nivel = nivel;
+	}
 
-    public String getOwner() {
-        return owner;
-    }
+	public String getOwner() {
+		return owner;
+	}
 
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
 
-    public double getDuracionMinutos() {
-        return duracionMinutos;
-    }
+	public double getDuracionMinutos() {
+		return duracionMinutos;
+	}
 
-    public void setDuracionMinutos(double duracionMinutos) {
-        this.duracionMinutos = duracionMinutos;
-    }
+	public void setDuracionMinutos(double duracionMinutos) {
+		this.duracionMinutos = duracionMinutos;
+	}
 
-    // Obtener todos los workouts y calcular su duración sumando duraciones de ejercicios
-    public List<Workout> mObtenerWorkouts() {
-        final List<Workout> lista = new ArrayList<>();
+	// Obtener todos los workouts y calcular su duración sumando duraciones de
+	// ejercicios
+	public List<Workout> mObtenerWorkouts() {
+		final List<Workout> lista = new ArrayList<>();
 
-        try (final Firestore co = Conexion.conectar()) {
-            final ApiFuture<QuerySnapshot> query = co.collection(collectionName).get();
-            final QuerySnapshot querySnapshot = query.get();
+		Firestore co = null;
+		try {
+			co = Conexion.conectar();
+			if (co == null)
+				throw new Exception("Sin conexion a Firestore");
 
-            for (final QueryDocumentSnapshot doc : querySnapshot.getDocuments()) {
-                final Workout w = new Workout();
+			final ApiFuture<QuerySnapshot> query = co.collection(collectionName).get();
+			final QuerySnapshot querySnapshot = query.get();
 
-                w.setNombre(doc.getId());
-                w.setDescripcion(doc.getString("Descripcion"));
-                w.setVideo(doc.getString("Video"));
+			for (final QueryDocumentSnapshot doc : querySnapshot.getDocuments()) {
+				final Workout w = new Workout();
 
-                final Long nivelL = doc.getLong("Nivel");
-                if (nivelL != null) {
-                    w.setNivel(nivelL.intValue());
-                }
+				w.setNombre(doc.getId());
+				w.setDescripcion(doc.getString("Descripcion"));
+				w.setVideo(doc.getString("Video"));
 
-                // owner opcional
-                String ownerStr = doc.getString("owner");
-                if (ownerStr == null) {
-                    ownerStr = doc.getString("Usuario");
-                }
-                w.setOwner(ownerStr);
+				final Long nivelL = doc.getLong("Nivel");
+				if (nivelL != null) {
+					w.setNivel(nivelL.intValue());
+				}
 
-                // Calcular duración sumando ejercicios
-                double durTotal = 0.0;
-                try {
-                    final List<Ejercicio> ejercs = new Ejercicio().mObtenerEjercicios(doc.getId());
-                    for (final Ejercicio e : ejercs) {
-                        durTotal += e.getDuracionMinutos();
-                    }
-                } catch (final Exception ex) {
-                    // ignoramos y dejamos duración en 0
-                }
+				// owner opcional
+				String ownerStr = doc.getString("owner");
+				if (ownerStr == null) {
+					ownerStr = doc.getString("Usuario");
+				}
+				w.setOwner(ownerStr);
 
-                w.setDuracionMinutos(durTotal);
-                lista.add(w);
-            }
+				// Calcular duración sumando ejercicios
+				double durTotal = 0.0;
+				try {
+					final List<Ejercicio> ejercs = new Ejercicio().mObtenerEjercicios(doc.getId());
+					for (final Ejercicio e : ejercs) {
+						durTotal += e.getDuracionMinutos();
+					}
+				} catch (final Exception ex) {
+					// ignoramos y dejamos duración en 0
+				}
 
-        } catch (final Exception e) {
-            System.out.println("Error: Clase Workouts - mObtenerWorkouts");
-            e.printStackTrace();
-        }
+				w.setDuracionMinutos(durTotal);
+				lista.add(w);
+			}
 
-        return lista;
-    }
+			co.close();
 
-    public List<Workout> obtenerWorkouts(final Long nivelUsuario) {
-        final List<Workout> lista = new ArrayList<>();
+		} catch (final Exception e) {
+			// Fallback: cargar desde backups si hay error
+			try {
+				ArrayList<WorkoutCompleto> backups = new lectura().leerWorkoutsDesdeBackup();
+				for (WorkoutCompleto wc : backups) {
+					if (wc == null || wc.getWorkout() == null)
+						continue;
+					Workout w = wc.getWorkout();
+					// recalcular duracion usando ejercicios del backup
+					double durTotal = 0.0;
+					if (wc.getEjercicios() != null) {
+						for (EjercicioConSeries ecs : wc.getEjercicios()) {
+							if (ecs != null)
+								durTotal += ecs.getDuracionMinutos();
+						}
+					}
+					w.setDuracionMinutos(durTotal);
+					lista.add(w);
+				}
+			} catch (Exception ex) {
+				System.out.println("Error: Clase Workouts - mObtenerWorkouts (fallback)");
+				ex.printStackTrace();
+			}
+		}
 
-        try (final Firestore co = Conexion.conectar()) {
-            final ApiFuture<QuerySnapshot> query;
+		return lista;
+	}
 
-            if (nivelUsuario != null) {
-                // filtrar por nivel si se pasa un valor
-                query = co.collection(collectionName)
-                          .whereLessThanOrEqualTo("Nivel", nivelUsuario)
-                          .get();
-            } else {
-                query = co.collection(collectionName).get();
-            }
+	public List<Workout> obtenerWorkouts(final Long nivelUsuario) {
+		final List<Workout> lista = new ArrayList<>();
 
-            final QuerySnapshot querySnapshot = query.get();
+		Firestore co = null;
+		try {
+			co = Conexion.conectar();
+			if (co == null)
+				throw new Exception("Sin conexion a Firestore");
 
-            for (final QueryDocumentSnapshot doc : querySnapshot.getDocuments()) {
-                final Workout w = new Workout();
+			final ApiFuture<QuerySnapshot> query;
 
-                w.setNombre(doc.getId());
-                w.setDescripcion(doc.getString("Descripcion"));
-                w.setVideo(doc.getString("Video"));
+			if (nivelUsuario != null) {
+				// filtrar por nivel si se pasa un valor
+				query = co.collection(collectionName).whereLessThanOrEqualTo("Nivel", nivelUsuario).get();
+			} else {
+				query = co.collection(collectionName).get();
+			}
 
-                final Long nivelL = doc.getLong("Nivel");
-                if (nivelL != null) {
-                    w.setNivel(nivelL.intValue());
-                }
+			final QuerySnapshot querySnapshot = query.get();
 
-                String ownerStr = doc.getString("owner");
-                if (ownerStr == null) {
-                    ownerStr = doc.getString("Usuario");
-                }
-                w.setOwner(ownerStr);
+			for (final QueryDocumentSnapshot doc : querySnapshot.getDocuments()) {
+				final Workout w = new Workout();
 
-                // Calcular duración sumando ejercicios relacionados a este workout
-                double durTotal = 0.0;
-                try {
-                    final List<Ejercicio> ejercs = new Ejercicio().mObtenerEjercicios(doc.getId());
-                    for (final Ejercicio e : ejercs) {
-                        durTotal += e.getDuracionMinutos();
-                    }
-                } catch (final Exception ex) {
-                    // ignoramos errores y duración queda 0
-                }
+				w.setNombre(doc.getId());
+				w.setDescripcion(doc.getString("Descripcion"));
+				w.setVideo(doc.getString("Video"));
 
-                w.setDuracionMinutos(durTotal);
-                lista.add(w);
-            }
+				final Long nivelL = doc.getLong("Nivel");
+				if (nivelL != null) {
+					w.setNivel(nivelL.intValue());
+				}
 
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
+				String ownerStr = doc.getString("owner");
+				if (ownerStr == null) {
+					ownerStr = doc.getString("Usuario");
+				}
+				w.setOwner(ownerStr);
 
-        return lista;
-    }
+				// Calcular duración sumando ejercicios
+				double durTotal = 0.0;
+				try {
+					final List<Ejercicio> ejercs = new Ejercicio().mObtenerEjercicios(doc.getId());
+					for (final Ejercicio e : ejercs) {
+						durTotal += e.getDuracionMinutos();
+					}
+				} catch (final Exception ex) {
+					// ignoramos errores y duración queda 0
+				}
+
+				w.setDuracionMinutos(durTotal);
+				lista.add(w);
+			}
+
+			co.close();
+
+		} catch (final Exception e) {
+			// cargar desde backups
+			try {
+				ArrayList<WorkoutCompleto> backups = new lectura().leerWorkoutsDesdeBackup();
+				for (WorkoutCompleto wc : backups) {
+					if (wc == null || wc.getWorkout() == null)
+						continue;
+					Workout w = wc.getWorkout();
+					if (nivelUsuario != null && w.getNivel() > nivelUsuario)
+						continue;
+					double durTotal = 0.0;
+					if (wc.getEjercicios() != null) {
+						for (EjercicioConSeries ecs : wc.getEjercicios()) {
+							if (ecs != null)
+								durTotal += ecs.getDuracionMinutos();
+						}
+					}
+					w.setDuracionMinutos(durTotal);
+					lista.add(w);
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+
+		return lista;
+	}
 }

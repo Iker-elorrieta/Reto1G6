@@ -18,16 +18,16 @@ public class HiloBackup extends Thread {
 		try {
 			ProcessBuilder pb = new ProcessBuilder(CMD_JAVA, FLAG_JAR, BACKUP_JAR);
 
-			// Redirigimos la salida para ver mensajes en la consola 
+			// ver mensajes en la consola
 			pb.inheritIO();
 			Process proces = pb.start();
 			try {
 				int exit = proces.waitFor();
 				System.out.println("Proceso Lectura finalizado con código: " + exit);
 
-				// También generar el XML del histórico de workouts localmente
+				// También generar el XML
 				try {
-					lectura.guardarHistoricoWorkoutsXML();
+					new lectura().guardarHistoricoWorkoutsXML();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
