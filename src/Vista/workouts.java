@@ -57,7 +57,7 @@ public class workouts extends JFrame {
 		contentPane.setLayout(null);
 		contentPane.setBackground(new Color(0, 0, 0));
 		
-		JLabel lblLogo = new JLabel("");
+		JLabel lblLogo = new JLabel(" ");
 		lblLogo.setBounds(10, 11, 174, 165);
 
 		ImageIcon iconoOriginal = new ImageIcon(IMG_LOGO_PATH);
@@ -100,8 +100,10 @@ public class workouts extends JFrame {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				return false; 
+			
+				return esCeldaEditable(row, column);
 			}
+			
 		});
 		
 		tableWorkouts.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -112,6 +114,15 @@ public class workouts extends JFrame {
 		scrollPaneWorkouts.setViewportView(tableWorkouts);
 
 	}
+	
+	
+	private boolean esCeldaEditable(int fila, int columna) {
+	
+		return false;
+	}
+
 	public JButton getBtnVolver() { return btnVolver; }
 	public JTable getTableWorkouts() { return tableWorkouts; }
+
+	public JTable getTablaWorkouts() { return tableWorkouts; }
 }

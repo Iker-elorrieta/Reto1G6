@@ -97,9 +97,9 @@ public class historicowo extends JFrame {
 				{null, null, null, null},
 			}, TABLE_HEADERS) {
 			private static final long serialVersionUID = 1L;
-			@Override
+			
 			public boolean isCellEditable(int row, int column) {
-				return false; 
+				return esCeldaEditable(row, column);
 			}
 		});
 		
@@ -111,6 +111,14 @@ public class historicowo extends JFrame {
 		scrollPaneHistorico.setViewportView(tableHistorico);
 
 	}
+
+	
+	private boolean esCeldaEditable(int fila, int columna) {
+		return false;
+	}
+
 	public JButton getBtnVolver() { return btnVolver; }
 	public JTable getTableWorkouts() { return tableHistorico; }
+	
+	public JTable getTablaWorkouts() { return tableHistorico; }
 }

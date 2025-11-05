@@ -43,9 +43,11 @@ public class lectura {
 	public void guardarUsuarios(ArrayList<Usuario> usuarios) {
 		try {
 			File dir = new File("backups");
-			if (!dir.exists()) dir.mkdirs();
+			if (!dir.exists())
+				dir.mkdirs();
 			File f = new File(FILE_USERS);
-			if (!f.exists()) f.createNewFile();
+			if (!f.exists())
+				f.createNewFile();
 			try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f))) {
 				ArrayList<Usuario> listaAEscribir;
 				if (usuarios != null) {
@@ -65,9 +67,11 @@ public class lectura {
 	public void guardarWorkouts(ArrayList<Workout> workouts) {
 		try {
 			File dir = new File("backups");
-			if (!dir.exists()) dir.mkdirs();
+			if (!dir.exists())
+				dir.mkdirs();
 			File f = new File(FILE_WORKOUTS);
-			if (!f.exists()) f.createNewFile();
+			if (!f.exists())
+				f.createNewFile();
 			ArrayList<WorkoutCompleto> listaWC = new ArrayList<>();
 			if (workouts != null) {
 				for (Workout wot : workouts) {
@@ -82,7 +86,8 @@ public class lectura {
 							ecs.setDescripcion(e.getDescripcion());
 							ecs.setImagen(e.getImagen());
 							ArrayList<Serie> series = new Serie().mObtenerSeries(wot.getNombre(), e.getNombre());
-							if (series == null) series = new ArrayList<>();
+							if (series == null)
+								series = new ArrayList<>();
 							ecs.setSeries(series);
 							ecsList.add(ecs);
 						}
@@ -105,7 +110,8 @@ public class lectura {
 	public ArrayList<WorkoutCompleto> leerWorkoutsDesdeBackup() {
 		ArrayList<WorkoutCompleto> lista = new ArrayList<>();
 		File f = new File(FILE_WORKOUTS);
-		if (!f.exists()) return lista;
+		if (!f.exists())
+			return lista;
 		try (java.io.ObjectInputStream ois = new java.io.ObjectInputStream(new java.io.FileInputStream(f))) {
 			Object obj = ois.readObject();
 			if (obj instanceof ArrayList) {
@@ -137,7 +143,8 @@ public class lectura {
 
 			for (QueryDocumentSnapshot userDoc : usuariosSnapshot.getDocuments()) {
 				String userId = userDoc.getId();
-				ApiFuture<QuerySnapshot> histQuery = co.collection("usuarios").document(userId).collection("historico_workouts").get();
+				ApiFuture<QuerySnapshot> histQuery = co.collection("usuarios").document(userId)
+						.collection("historico_workouts").get();
 				QuerySnapshot histSnapshot = histQuery.get();
 				for (QueryDocumentSnapshot histDoc : histSnapshot.getDocuments()) {
 					Element histElem = doc.createElement("historico_wo");
@@ -179,7 +186,8 @@ public class lectura {
 						List<?> list = (List<?>) ejercsObj;
 						StringBuilder sb = new StringBuilder();
 						for (int i = 0; i < list.size(); i++) {
-							if (i > 0) sb.append(",");
+							if (i > 0)
+								sb.append(",");
 							Object listItem = list.get(i);
 							if (listItem != null) {
 								sb.append(listItem.toString());
@@ -226,7 +234,8 @@ public class lectura {
 			co.close();
 
 			File dir = new File("backups");
-			if (!dir.exists()) dir.mkdirs();
+			if (!dir.exists())
+				dir.mkdirs();
 			File outFile = new File(dir, "historico_workouts.xml");
 
 			TransformerFactory tf = TransformerFactory.newInstance();
@@ -270,7 +279,8 @@ public class lectura {
 	public ArrayList<Usuario> leerUsuariosDesdeBackup() {
 		ArrayList<Usuario> lista = new ArrayList<>();
 		File f = new File(FILE_USERS);
-		if (!f.exists()) return lista;
+		if (!f.exists())
+			return lista;
 		try (java.io.ObjectInputStream ois = new java.io.ObjectInputStream(new java.io.FileInputStream(f))) {
 			Object obj = ois.readObject();
 			if (obj instanceof ArrayList) {
@@ -286,11 +296,11 @@ public class lectura {
 		return lista;
 	}
 
-	
-	public ArrayList<java.util.Map<String,String>> leerHistoricoDesdeXML() {
-		ArrayList<java.util.Map<String,String>> lista = new ArrayList<>();
+	public ArrayList<java.util.Map<String, String>> leerHistoricoDesdeXML() {
+		ArrayList<java.util.Map<String, String>> lista = new ArrayList<>();
 		File f = new File("backups/historico_workouts.xml");
-		if (!f.exists()) return lista;
+		if (!f.exists())
+			return lista;
 		try {
 			javax.xml.parsers.DocumentBuilderFactory dbFactory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
 			javax.xml.parsers.DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -301,7 +311,7 @@ public class lectura {
 				org.w3c.dom.Node n = nodes.item(i);
 				if (n.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
 					org.w3c.dom.Element e = (org.w3c.dom.Element) n;
-					java.util.Map<String,String> mapa = new java.util.HashMap<>();
+					java.util.Map<String, String> mapa = new java.util.HashMap<>();
 					mapa.put("usuario_id", getTagValue("usuario_id", e));
 					mapa.put("id_workout", getTagValue("id_workout", e));
 					mapa.put("ejercicios_hechos", getTagValue("ejercicios_hechos", e));

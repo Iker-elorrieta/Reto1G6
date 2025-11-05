@@ -121,7 +121,8 @@ public class Usuario implements Serializable {
 
 		try {
 			co = Conexion.conectar();
-			if (co == null) throw new Exception("Sin conexion a Firestore");
+			if (co == null)
+				throw new Exception("Sin conexion a Firestore");
 			DocumentSnapshot usuario = co.collection(collectionName).document(idUsuario).get().get();
 
 			if (usuario.exists()) {
@@ -170,7 +171,8 @@ public class Usuario implements Serializable {
 
 		try {
 			co = Conexion.conectar();
-			if (co == null) throw new Exception("Sin conexion a Firestore");
+			if (co == null)
+				throw new Exception("Sin conexion a Firestore");
 			ApiFuture<QuerySnapshot> query = co.collection(collectionName).get();
 			QuerySnapshot querySnapshot = query.get();
 			List<QueryDocumentSnapshot> usuarios = querySnapshot.getDocuments();
@@ -186,8 +188,8 @@ public class Usuario implements Serializable {
 				Object valor = usuario.get(fieldNivel);
 
 				if (valor == null) {
-				    nivelObj = 0.0; 
-				} 	else if (valor instanceof Number) {
+					nivelObj = 0.0;
+				} else if (valor instanceof Number) {
 					nivelObj = ((Number) valor).doubleValue();
 				} else {
 					nivelObj = Double.parseDouble((String) valor);
@@ -196,12 +198,12 @@ public class Usuario implements Serializable {
 				u.setNivel(nivelObj);
 
 				Object valorTipo = usuario.get(fieldTipoUsuario);
-				String tipoUsuario= null;
+				String tipoUsuario = null;
 
 				if (valorTipo == null) {
-				    tipoUsuario = null; 
+					tipoUsuario = null;
 				} else if (valorTipo instanceof String) {
-				    tipoUsuario = ((String) valorTipo).trim();
+					tipoUsuario = ((String) valorTipo).trim();
 				} else if (valorTipo instanceof Boolean) {
 					Boolean b = (Boolean) valorTipo;
 					if (b.booleanValue()) {
@@ -226,7 +228,8 @@ public class Usuario implements Serializable {
 			// leer usuarios desde backups
 			try {
 				ArrayList<Usuario> lista = new lectura().leerUsuariosDesdeBackup();
-				if (lista != null) return lista;
+				if (lista != null)
+					return lista;
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -288,7 +291,8 @@ public class Usuario implements Serializable {
 
 		try {
 			co = Conexion.conectar();
-			if (co == null) throw new Exception("Sin conexion a Firestore");
+			if (co == null)
+				throw new Exception("Sin conexion a Firestore");
 			String emailId;
 			if (email != null) {
 				emailId = email.trim().toLowerCase();
@@ -310,7 +314,7 @@ public class Usuario implements Serializable {
 			co.close();
 
 		} catch (Exception e) {
-			//  autenticar con backups
+			// autenticar con backups
 			try {
 				ArrayList<Usuario> lista = new lectura().leerUsuariosDesdeBackup();
 				String emailId;
@@ -319,10 +323,12 @@ public class Usuario implements Serializable {
 				} else {
 					emailId = null;
 				}
-				if (emailId == null) return false;
+				if (emailId == null)
+					return false;
 				for (Usuario u : lista) {
 					if (u.getEmail() != null && u.getEmail().equals(emailId)) {
-						if (u.getPass() != null && u.getPass().equals(pass)) return true;
+						if (u.getPass() != null && u.getPass().equals(pass))
+							return true;
 					}
 				}
 			} catch (Exception ex) {

@@ -2,15 +2,13 @@ package Modelo;
 
 import com.google.cloud.Date;
 
-
-
 public class historicoWorkout {
 
-	private Workout id_workout; 
-	private int ejercicios_hechos; 
-	private int tiempo; 
-	private Date fecha; 
-	
+	private Workout id_workout;
+	private int ejercicios_hechos;
+	private int tiempo;
+	private Date fecha;
+
 	public historicoWorkout(Workout workout, int ejerciciosCompletados, int tiempoTotal, Date fecha) {
 		this.id_workout = workout;
 		this.ejercicios_hechos = ejerciciosCompletados;
@@ -50,7 +48,4 @@ public class historicoWorkout {
 		this.fecha = fecha;
 	}
 
-	
-	
-	
 }

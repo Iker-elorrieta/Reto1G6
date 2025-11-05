@@ -19,13 +19,12 @@ public class menu extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JButton btnPerfil;
-	private JButton btnCerrarSesion; 
-	private JLabel lblbienvenido; 
-	private JLabel lblNivel; 
+	private JButton btnCerrarSesion;
+	private JLabel lblbienvenido;
+	private JLabel lblNivel;
 	private JButton btnEmpezar;
 	private JButton btnHistorico;
 
-	
 	private final String IMG_LOGO_PATH = "media/logo1.png";
 	private final String TXT_MENU = "Menú";
 	private final String TXT_BIEN = "Bienvenido, ";
@@ -62,7 +61,7 @@ public class menu extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		contentPane.setBackground(new Color(0, 0, 0));
-		
+
 		JLabel lblLogo = new JLabel("");
 		lblLogo.setBounds(10, 11, 174, 165);
 
@@ -73,50 +72,49 @@ public class menu extends JFrame {
 		lblLogo.setIcon(new ImageIcon(imagenEscalada));
 
 		contentPane.add(lblLogo);
-		
+
 		JLabel lblMenu = new JLabel(TXT_MENU);
 		lblMenu.setForeground(UIManager.getColor("Button.highlight"));
 		lblMenu.setBackground(UIManager.getColor("Button.highlight"));
 		lblMenu.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblMenu.setBounds(423, 34, 91, 41);
 		contentPane.add(lblMenu);
-		
+
 		lblbienvenido = new JLabel(TXT_BIEN);
 		lblbienvenido.setForeground(Color.WHITE);
 		lblbienvenido.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblbienvenido.setBackground(Color.WHITE);
 		lblbienvenido.setBounds(308, 109, 330, 41);
 		contentPane.add(lblbienvenido);
-		
+
 		lblNivel = new JLabel(TXT_NIVEL);
 		lblNivel.setForeground(new Color(128, 0, 0));
 		lblNivel.setFont(new Font("Tahoma", Font.BOLD, 26));
 		lblNivel.setBackground(Color.WHITE);
 		lblNivel.setBounds(379, 491, 237, 41);
 		contentPane.add(lblNivel);
-		
+
 		btnPerfil = new JButton(BTN_PERFIL);
 		btnPerfil.setForeground(new Color(240, 248, 255));
 		btnPerfil.setFont(new Font("Tahoma", Font.BOLD, 14));
 		btnPerfil.setBackground(new Color(139, 0, 0));
 		btnPerfil.setBounds(775, 34, 89, 41);
 		contentPane.add(btnPerfil);
-		
+
 		btnEmpezar = new JButton(BTN_EMPEZAR);
 		btnEmpezar.setForeground(new Color(240, 248, 255));
 		btnEmpezar.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnEmpezar.setBackground(new Color(139, 0, 0));
 		btnEmpezar.setBounds(324, 218, 237, 41);
 		contentPane.add(btnEmpezar);
-		
+
 		btnHistorico = new JButton(BTN_HISTORICO);
 		btnHistorico.setForeground(new Color(240, 248, 255));
 		btnHistorico.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnHistorico.setBackground(new Color(139, 0, 0));
 		btnHistorico.setBounds(324, 288, 237, 41);
 		contentPane.add(btnHistorico);
-		
-	
+
 		btnCerrarSesion = new JButton(BTN_CERRAR);
 		btnCerrarSesion.setForeground(new Color(240, 248, 255));
 		btnCerrarSesion.setFont(new Font("Tahoma", Font.BOLD, 16));
@@ -126,7 +124,6 @@ public class menu extends JFrame {
 
 	}
 
-	
 	public void setBienvenido(String nombre) {
 		this.lblbienvenido.setText(TXT_BIEN + nombre);
 	}
@@ -143,10 +140,27 @@ public class menu extends JFrame {
 		}
 	}
 
-	public JButton getBtnPerfil() { return btnPerfil; }
-	public JButton getBtnEmpezar() { return btnEmpezar; }
-	public JButton getBtnCerrarSesion() { return btnCerrarSesion; }
-	public JButton getBtnHistorico() { return btnHistorico; }
-	public JLabel getLblbienvenido() { return lblbienvenido; }
-	public JLabel getLblNivel() { return lblNivel; }
+	public JButton getBtnPerfil() {
+		return btnPerfil;
+	}
+
+	public JButton getBtnEmpezar() {
+		return btnEmpezar;
+	}
+
+	public JButton getBtnCerrarSesion() {
+		return btnCerrarSesion;
+	}
+
+	public JButton getBtnHistorico() {
+		return btnHistorico;
+	}
+
+	public JLabel getLblbienvenido() {
+		return lblbienvenido;
+	}
+
+	public JLabel getLblNivel() {
+		return lblNivel;
+	}
 }
